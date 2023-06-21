@@ -49,7 +49,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Route Middlewares
 
-app.use('/app/api/auth', authApp);
+app.use('/api/auth', authApp);
 //app.use('/app/api/user', userApp);
 //app.use('/app/api/notification', notificationApp);
 
