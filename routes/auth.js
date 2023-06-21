@@ -21,6 +21,11 @@ const transporter = nodemailer.createTransport({
 });
 
 
+router.post("/login2", (req, res) => {
+    const token = jwt.sign({ _id: "123a", role: "user" }, process.env.TOKEN_SECRET, { expiresIn: '2h', issuer: process.env.ISSUER_JWT });
+    res.json({ accessToken: token })
+})
+
 router.post("/login", authenticateToken, async (req, res) => {
 
     const { email, password } = req.body;
