@@ -37,12 +37,6 @@ mongoose.connect(
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use(session({
-    secret: process.env.TOKEN_SECRET,
-    resave: false, // We wont resave the session variable if nothing is changed
-    saveUninitialized: false
-}))
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 
