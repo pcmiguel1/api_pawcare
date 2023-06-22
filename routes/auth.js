@@ -10,6 +10,9 @@ const path = require('path')
 const hbs = require('nodemailer-express-handlebars');
 const { authenticateToken } = require('../config/verifyToken');
 
+const { Storage } = require("@google-cloud/storage");
+const multer = require('multer');
+
 const transporter = nodemailer.createTransport({
     host: 'mail.privateemail.com',
     port: 465,
@@ -19,6 +22,17 @@ const transporter = nodemailer.createTransport({
         pass: 'Comidafix123a@'
     }
 });
+
+const gc = new Storage({
+    keyFilename: path.join(__dirname, "./config/pawcare-390615-bb548a465c8a.json"),
+    projectId: "pawcare-390615"
+});
+
+// Configure multer storage
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
+
+const imagesBucket = gc.bucket('pawcare_imgs');
 
 
 router.post("/login2", (req, res) => {
@@ -67,7 +81,7 @@ router.post("/login", authenticateToken, async (req, res) => {
 
 })
 
-router.post("/register", authenticateToken, async (req, res) => {
+router.post("/register", authenticateToken, upload.single('image'), async (req, res) => {
 
     //LETS VALIDATE THE DATA BEFORE WE A USER
     const { fullname, dateOfBirth, phoneNumber, email, password } = req.body;
@@ -76,6 +90,8 @@ router.post("/register", authenticateToken, async (req, res) => {
     //if (!phoneNumber) return res.status(422).json({ message: 'phoneNumber is required!' })
     if (!email) return res.status(422).json({ message: 'email is required!' })
     if (!password) return res.status(422).json({ message: 'password is required!' })
+    
+    const file = req.file;
 
     //Checking if the user is already in the database and is already verified
     const emailExist = await User.findOne({email: email, verified: true});
@@ -88,6 +104,28 @@ router.post("/register", authenticateToken, async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashPassword = await bcrypt.hash(password, salt);
 
+    //upload image if exists
+    var fileName = ""
+    if (file) {
+
+        fileName = Date.now() + "_" + file.originalname;
+        const uploadOptions = {
+            destination: fileName,
+            metadata: {
+              contentType: file.mimetype
+            }
+        };
+
+        imagesBucket.upload(file.buffer, uploadOptions, (err, uploadedFoçe) => {
+            if (err) {
+                console.error('Error uploading file:', err);
+                return res.status(500).json({ error: 'Failed to upload image' });
+            }
+
+        })
+
+    }
+
     //Create a new user
     const user = new User({
         fullname: fullname,
@@ -95,19 +133,19 @@ router.post("/register", authenticateToken, async (req, res) => {
         password: hashPassword,
         dateOfBirth: dateOfBirth,
         //phoneNumber: phoneNumber,
-        image: req.body.image
+        image: fileName
     });
 
     try {
         const savedUser = await user.save()
         .then((result) => {
-            sendVerificationEmail(result, res);
+            //sendVerificationEmail(result, res);
+            res.status(200).json(savedUser);
         })
         .catch((err) => {
             res.status(400).send(err);
         })
-    
-        //res.status(200).json(savedUser);
+
     } catch(err) {
         res.status(400).send(err);
     }
