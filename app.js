@@ -41,7 +41,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-//Route Middlewares
+//Route Middleware
 
 app.use('/api/auth', authApp);
 //app.use('/app/api/user', userApp);
