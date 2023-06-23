@@ -18,8 +18,8 @@ const transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: 'support@pawcare.app',
-        pass: 'Comidafix123a@'
+        user: process.env.EMAIL,
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
@@ -133,7 +133,7 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
                     email: email,
                     password: hashPassword,
                     dateOfBirth: dateOfBirth,
-                    //phoneNumber: phoneNumber,
+                    phoneNumber: phoneNumber,
                     image: publicUrl
                 });
 
@@ -168,15 +168,14 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
             email: email,
             password: hashPassword,
             dateOfBirth: dateOfBirth,
-            //phoneNumber: phoneNumber,
-            image: publicUrl
+            phoneNumber: phoneNumber
         });
 
         try {
             const savedUser = await user.save()
             .then((result) => {
-                //sendVerificationEmail(result, res);
-                return res.status(200).json(result);
+                sendVerificationEmail(result, res);
+                //return res.status(200).json(result);
             })
             .catch((err) => {
                 res.status(400).send(err);
@@ -456,18 +455,6 @@ const sendVerificationEmail = async (user, res) => {
 
     //const uniqueString = uuidv4() + _id;
 
-    const handlebarOptions = {
-        viewEngine: {
-            extName: ".handlebars",
-            partialsDir: path.resolve('./views'),
-            defaultLayout: false
-        },
-        viewPath: path.resolve('./views'),
-        extName: ".handlebars"
-    }
-
-    transporter.use('compile', hbs(handlebarOptions));
-
     //var url = currentUrl + "auth/verify/" + _id + "/" + uniqueString
 
     const randomNumber = Math.floor(Math.random() * 9000) + 1000;
@@ -478,10 +465,6 @@ const sendVerificationEmail = async (user, res) => {
         to: email,
         subject: "Verify your Email",
         html: `<p>Code to confirm Email is valid for 1h: <b>${randomNumber}</b></p>`,
-        template: 'verifyemail',
-        context: {
-            url: randomNumber
-        }
     }
 
     const newVerification = new UserVerification({
@@ -627,43 +610,3 @@ router.get('/verify/:userId/:code', authenticateToken, (req, res) => {
 })
 
 module.exports = router;
-
-/*//LOGIN
-router.post('/login', async (req, res) => {
-
-    const { email, password } = req.body;
-    const result = {}
-    
-    //Validations
-    if (!email) return res.status(422).json({ message: 'Email is required!' })
-    if (!password) return res.status(422).json({ message: 'Password is required!' })
-    
-    //Checking if email exists
-    await User.findOne({email: email})
-        .then(async function (user) {
-
-            if (!user) return res.status(404).send({status: 404, message: "Wrong credentials"});
-
-            //PASSWORD IS CORRECT
-            const validPass = await bcrypt.compare(req.body.password, user.password);
-            if (!validPass) return res.status(404).send({status: 404, message: "Wrong credentials"});
-
-            //Create and assign a token
-            const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '30m' });
-
-            result.user = user;
-            result.token = token;
-
-            //res.status(200).json(result);
-
-            res.cookie("access_token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
-            }).status(200).redirect('/dashboard');
-
-        })
-        .catch(() => {
-            res.status(500).send({message: err.message || "Error Occured while retriving information."})
-        })
-
-});*/
