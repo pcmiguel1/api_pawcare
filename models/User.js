@@ -20,16 +20,14 @@ const userSchema = new mongoose.Schema({
         min: 6
     },
     phoneNumber: {
-        type: String,
-        default: ""
+        type: String
     },
     dateOfBirth: {
         type: String,
         require: true
     },
     image: {
-        type: String,
-        default: ""
+        type: String
     },
     date: {
         type: Date,

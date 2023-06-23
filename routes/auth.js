@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const gc = new Storage({
-    keyFilename: path.join(__dirname, "./config/pawcare-390615-bb548a465c8a.json"),
+    keyFilename: path.join(__dirname, "../config/pawcare-390615-bb548a465c8a.json"),
     projectId: "pawcare-390615"
 });
 
@@ -86,7 +86,7 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
     //LETS VALIDATE THE DATA BEFORE WE A USER
     const { fullname, dateOfBirth, phoneNumber, email, password } = req.body;
     if (!fullname) return res.status(422).json({ message: 'fullname is required!' })
-    if (!dateOfBirth) return res.status(422).json({ mmessagesg: 'dateOfBirth is required!' })
+    if (!dateOfBirth) return res.status(422).json({ message: 'dateOfBirth is required!' })
     //if (!phoneNumber) return res.status(422).json({ message: 'phoneNumber is required!' })
     if (!email) return res.status(422).json({ message: 'email is required!' })
     if (!password) return res.status(422).json({ message: 'password is required!' })
@@ -94,7 +94,7 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
     const file = req.file;
 
     //Checking if the user is already in the database and is already verified
-    const emailExist = await User.findOne({email: email, verified: true});
+    const emailExist = await User.findOne({email: email});
     if (emailExist) return res.status(400).json({ message: "Email already exists." })
 
     //const phoneNumberExist = await User.findOne({phoneNumber: phoneNumber});
@@ -109,45 +109,83 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
     if (file) {
 
         fileName = Date.now() + "_" + file.originalname;
-        const uploadOptions = {
-            destination: fileName,
-            metadata: {
-              contentType: file.mimetype
-            }
-        };
 
-        imagesBucket.upload(file.buffer, uploadOptions, (err, uploadedFoçe) => {
-            if (err) {
-                console.error('Error uploading file:', err);
-                return res.status(500).json({ error: 'Failed to upload image' });
-            }
-
+        const blob = imagesBucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            resumable: false,
         })
+
+        blobStream.on("error", (err) => {
+            res.status(500).send({ message: err.message });
+        });
+
+        blobStream.on("finish", async (data) => {
+
+            const publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+
+            try {
+                // Make the file public
+                await imagesBucket.file(fileName).makePublic();
+
+                //Create a new user
+                const user = new User({
+                    fullname: fullname,
+                    email: email,
+                    password: hashPassword,
+                    dateOfBirth: dateOfBirth,
+                    //phoneNumber: phoneNumber,
+                    image: publicUrl
+                });
+
+                try {
+                    const savedUser = await user.save()
+                    .then((result) => {
+                        //sendVerificationEmail(result, res);
+                        return res.status(200).json(result);
+                    })
+                    .catch((err) => {
+                        res.status(400).send(err);
+                    })
+
+                } catch(err) {
+                    res.status(400).send(err);
+                }
+
+
+            } catch (err) {
+                console.log(err);
+            }
+        });
+      
+        blobStream.end(req.file.buffer);
 
     }
+    else {
 
-    //Create a new user
-    const user = new User({
-        fullname: fullname,
-        email: email,
-        password: hashPassword,
-        dateOfBirth: dateOfBirth,
-        //phoneNumber: phoneNumber,
-        image: fileName
-    });
+        //Create a new user
+        const user = new User({
+            fullname: fullname,
+            email: email,
+            password: hashPassword,
+            dateOfBirth: dateOfBirth,
+            //phoneNumber: phoneNumber,
+            image: publicUrl
+        });
 
-    try {
-        const savedUser = await user.save()
-        .then((result) => {
-            //sendVerificationEmail(result, res);
-            res.status(200).json(savedUser);
-        })
-        .catch((err) => {
+        try {
+            const savedUser = await user.save()
+            .then((result) => {
+                //sendVerificationEmail(result, res);
+                return res.status(200).json(result);
+            })
+            .catch((err) => {
+                res.status(400).send(err);
+            })
+
+        } catch(err) {
             res.status(400).send(err);
-        })
+        }
 
-    } catch(err) {
-        res.status(400).send(err);
     }
 
 })
