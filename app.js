@@ -19,8 +19,8 @@ const authApp = require('./routes/auth');
 dotenv.config();
 app.use(cookieParser());
 
-app.use(bodyParser.json({ limit: '5000mb' }));
-app.use(bodyParser.urlencoded({ limit: '5000mb', extended: true }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 //Connect to DB
 mongoose.connect(
