@@ -83,6 +83,8 @@ router.post("/login", authenticateToken, async (req, res) => {
 
 router.post("/register", authenticateToken, upload.single('image'), async (req, res) => {
 
+    console.log(req.body);
+
     //LETS VALIDATE THE DATA BEFORE WE A USER
     const { fullname, dateOfBirth, phoneNumber, email, password } = req.body;
     if (!fullname) return res.status(422).json({ message: 'fullname is required!' })
@@ -174,8 +176,8 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
         try {
             const savedUser = await user.save()
             .then((result) => {
-                sendVerificationEmail(result, res);
-                //return res.status(200).json(result);
+                //sendVerificationEmail(result, res);
+                return res.status(200).json(result);
             })
             .catch((err) => {
                 res.status(400).send(err);
