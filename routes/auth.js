@@ -84,7 +84,7 @@ router.post("/login", authenticateToken, async (req, res) => {
 router.post("/register", authenticateToken, upload.single('image'), async (req, res) => {
 
     //LETS VALIDATE THE DATA BEFORE WE A USER
-    const { fullname, dateOfBirth, phoneNumber, email, password } = req.body.user;
+    const { fullname, dateOfBirth, phoneNumber, email, password } = req.body;
     if (!fullname) return res.status(422).json({ message: 'fullname is required!' })
     if (!dateOfBirth) return res.status(422).json({ message: 'dateOfBirth is required!' })
     //if (!phoneNumber) return res.status(422).json({ message: 'phoneNumber is required!' })
