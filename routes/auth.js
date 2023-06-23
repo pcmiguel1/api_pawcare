@@ -36,7 +36,7 @@ const imagesBucket = gc.bucket('pawcare_imgs');
 
 
 router.post("/login2", (req, res) => {
-    const token = jwt.sign({ _id: "123a", role: "user" }, process.env.TOKEN_SECRET, { expiresIn: '2h', issuer: process.env.ISSUER_JWT });
+    const token = jwt.sign({ _id: "123a", role: "user" }, process.env.TOKEN_SECRET, { expiresIn: '10h', issuer: process.env.ISSUER_JWT });
     res.json({ accessToken: token })
 })
 
@@ -62,7 +62,7 @@ router.post("/login", authenticateToken, async (req, res) => {
                 if (!validPass) return res.status(404).json({message: "Wrong credentials"});
 
                 //Create and assign a token
-                const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '1h', issuer: process.env.ISSUER_JWT });
+                const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '10h', issuer: process.env.ISSUER_JWT });
 
                 result.user = user;
                 result.token = token;
