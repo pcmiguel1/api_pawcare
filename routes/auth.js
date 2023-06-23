@@ -144,16 +144,17 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
                         return res.status(200).json(result);
                     })
                     .catch((err) => {
-                        res.status(400).send(err);
+                        res.status(400).json({ message: err });
                     })
 
                 } catch(err) {
-                    res.status(400).send(err);
+                    res.status(400).json({ message: err });
                 }
 
 
             } catch (err) {
                 console.log(err);
+                res.status(400).json({ message: err });
             }
         });
       
@@ -178,11 +179,11 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
                 return res.status(200).json(result);
             })
             .catch((err) => {
-                res.status(400).send(err);
+                res.status(400).json({ message: err });
             })
 
         } catch(err) {
-            res.status(400).send(err);
+            res.status(400).json({ message: err });
         }
 
     }
