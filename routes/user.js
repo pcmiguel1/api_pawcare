@@ -85,6 +85,15 @@ router.get("/pets", authenticateToken, async (req, res) => {
 
 router.post("/update", authenticateToken, async (req, res) => {
 
+    if ('password' in req.body) {
+
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+        req.body.password = hashPassword;
+
+    }
+
     await User.findByIdAndUpdate(
         req.userId, { $set: req.body }
     ).then(() => {
