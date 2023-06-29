@@ -47,9 +47,9 @@ router.post("/pet/add", authenticateToken, async (req, res) => {
 router.get("/pets", authenticateToken, async (req, res) => {
 
     const pets = await Pet.find({ user_id: req.userId });
-    if (pets.length === 0) return res.status(200).json({ message: 'There are no pets!' });
+    //if (pets.length === 0) return res.status(200).json({ message: 'There are no pets!' });
 
-    res.status(200).json({ pets })
+    res.status(200).json(pets)
 
 })
 
