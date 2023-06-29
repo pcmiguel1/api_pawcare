@@ -13,6 +13,7 @@ const bodyParser = require('body-parser');
 //Import Routes
 
 const authApp = require('./routes/auth');
+const userApp = require('./routes/user');
 
 //APP
 
@@ -44,7 +45,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Route Middleware
 
 app.use('/api/auth', authApp);
-//app.use('/app/api/user', userApp);
+app.use('/api/user', userApp);
 //app.use('/app/api/notification', notificationApp);
 
 app.use('/images', express.static(path.join(__dirname, 'images')))

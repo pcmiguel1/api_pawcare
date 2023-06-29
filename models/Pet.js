@@ -7,26 +7,34 @@ const petSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: true,
-        min: 6,
-        max: 255,
         required: true
+    },
+    specie: {
+        type: String, 
+        require: true
     },
     breed: {
+        type: String
+    },
+    gender: {
         type: String,
         required: true
     },
-    sex: {
+    dateOfBirth: {
         type: String,
         required: true
-    },
-    date: {
-        type: Date,
-        default: ""
     },
     photo: {
-        type: String,
-        default: ""
+        type: String
+    },
+    vaccinated: {
+        type: Boolean
+    },
+    friendly: {
+        type: Boolean
+    },
+    microchip: {
+        type: Boolean
     }
 });
 
