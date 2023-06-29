@@ -44,6 +44,36 @@ router.post("/pet/add", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/pet/update/:id", authenticateToken, async (req, res) => {
+
+    let id = req.params.id;
+
+    const petExist = await Pet.findOne({_id: id, user_id: req.userId});
+    if (!petExist) return res.status(422).json({ message: "No result!" })
+
+    await Pet.findByIdAndUpdate(
+        id, { $set: req.body }
+    ).then(() => {
+        return res.status(200).json({ message: "Pet updated successfully!" });
+    });
+
+})
+
+router.get('/pet/delete/:id', authenticateToken, async (req, res) => {
+    let id = req.params.id;
+
+    const petExist = await Pet.findOne({_id: id, user_id: req.userId});
+    if (!petExist) return res.status(422).json({ message: "No result!" })
+
+    Pet.findByIdAndDelete(id, (err, result) => {
+        if (err) {
+            res.json({ message: err.message });
+        } else {
+            return res.status(200).json({ message: "Pet deleted successfully!" });
+        }
+    });
+});
+
 router.get("/pets", authenticateToken, async (req, res) => {
 
     const pets = await Pet.find({ user_id: req.userId });
