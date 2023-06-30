@@ -24,7 +24,7 @@ const imagesBucket = gc.bucket('pawcare_imgs');
 
 router.post("/pet/add", authenticateToken, upload.single('image'), async (req, res) => {
 
-    const { name, specie, breed, gender, dateOfBirth, vaccinated, friendly, microchip } = req.body;
+    const { name, specie, breed, gender, dateOfBirth, vaccinated, friendly, microchip } = JSON.parse(req.body.pet)
 
     //Validations
     if (!name) return res.status(422).json({ message: 'Name is required!' })
@@ -198,7 +198,7 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
         }
     
         await User.findByIdAndUpdate(
-            req.userId, { $set: update }
+            req.userId, { $set: update } , { new: true }
         ).then((result) => {
             return res.status(200).json(result);
         });
