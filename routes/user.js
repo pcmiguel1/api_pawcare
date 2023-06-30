@@ -34,7 +34,6 @@ router.post("/pet/add", authenticateToken, upload.single('image'), async (req, r
 
     const file = req.file;
 
-    var publicUrl = ""
     var fileName = ""
     if (file) {
 
@@ -51,11 +50,32 @@ router.post("/pet/add", authenticateToken, upload.single('image'), async (req, r
 
         blobStream.on("finish", async (data) => {
 
-            publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+            const publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
 
             try {
                 // Make the file public
                 await imagesBucket.file(fileName).makePublic();
+
+                //Create a new pet
+                const pet = new Pet({
+                    user_id: req.userId,
+                    name: name,
+                    specie: specie,
+                    breed: breed || "",
+                    gender: gender,
+                    dateOfBirth: dateOfBirth,
+                    photo: publicUrl,
+                    vaccinated: vaccinated || false,
+                    friendly: friendly || false,
+                    microchip: microchip || false
+                });
+
+                try {
+                    const savedPet = await pet.save();
+                    return res.status(200).json(savedPet);
+                } catch (err) {
+                    return res.status(400).json({ message: err });
+                }
 
             } catch (err) {
                 console.log(err);
@@ -66,27 +86,30 @@ router.post("/pet/add", authenticateToken, upload.single('image'), async (req, r
         blobStream.end(req.file.buffer);
 
     }
+    else {
 
-     //Create a new pet
-     const pet = new Pet({
-        user_id: req.userId,
-        name: name,
-        specie: specie,
-        breed: breed || "",
-        gender: gender,
-        dateOfBirth: dateOfBirth,
-        photo: publicUrl,
-        vaccinated: vaccinated || false,
-        friendly: friendly || false,
-        microchip: microchip || false
-    });
+        //Create a new pet
+        const pet = new Pet({
+            user_id: req.userId,
+            name: name,
+            specie: specie,
+            breed: breed || "",
+            gender: gender,
+            dateOfBirth: dateOfBirth,
+            photo: "",
+            vaccinated: vaccinated || false,
+            friendly: friendly || false,
+            microchip: microchip || false
+        });
 
-    try {
-        const savedPet = await pet.save();
-        return res.status(200).json(savedPet);
-      } catch (err) {
-        return res.status(400).json({ message: err });
-      }
+        try {
+            const savedPet = await pet.save();
+            return res.status(200).json(savedPet);
+        } catch (err) {
+            return res.status(400).json({ message: err });
+        }
+
+    }
 
 })
 
