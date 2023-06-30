@@ -6,9 +6,20 @@ const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
 
 const path = require('path')
-const fs = require('fs')
-const { promisify } = require('util');
-const unlinkAsync = promisify(fs.unlink)
+
+const { Storage } = require("@google-cloud/storage");
+const multer = require('multer');
+
+const gc = new Storage({
+    keyFilename: path.join(__dirname, "../config/pawcare-390615-bb548a465c8a.json"),
+    projectId: "pawcare-390615"
+});
+
+// Configure multer storage
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
+
+const imagesBucket = gc.bucket('pawcare_imgs');
 
 
 router.post("/pet/add", authenticateToken, async (req, res) => {
@@ -83,22 +94,81 @@ router.get("/pets", authenticateToken, async (req, res) => {
 
 })
 
-router.post("/update", authenticateToken, async (req, res) => {
+router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
-    if ('password' in req.body) {
+    //var body = JSON.parse(req.body.user)
 
-        const salt = await bcrypt.genSalt(10);
-        const hashPassword = await bcrypt.hash(req.body.password, salt);
+    var body = req.body
 
-        req.body.password = hashPassword;
+    var update = {}
+    update = body;
+
+    const file = req.file;
+
+    var fileName = ""
+    if (file) {
+
+        fileName = Date.now() + "_" + file.originalname;
+
+        const blob = imagesBucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            resumable: false,
+        })
+
+        blobStream.on("error", (err) => {
+            res.status(500).send({ message: err.message });
+        });
+
+        blobStream.on("finish", async (data) => {
+
+            const publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+
+            // Make the file public
+            await imagesBucket.file(fileName).makePublic();
+
+            update.image = publicUrl;
+
+            if ('password' in body) {
+
+                const salt = await bcrypt.genSalt(10);
+                const hashPassword = await bcrypt.hash(body.password, salt);
+        
+                update.password = hashPassword;
+        
+            }
+    
+            try {
+                const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
+                return res.status(200).json(updatedUser);
+            } catch (err) {
+                console.log(err);
+                return res.status(400).json({ message: err });
+            }
+
+        });
+      
+        blobStream.end(req.file.buffer);
+
 
     }
+    else {
 
-    await User.findByIdAndUpdate(
-        req.userId, { $set: req.body }
-    ).then(() => {
-        return res.status(200).json({ message: "Profile updated successfully!" });
-    });
+        if ('password' in body) {
+
+            const salt = await bcrypt.genSalt(10);
+            const hashPassword = await bcrypt.hash(body.password, salt);
+    
+            update.password = hashPassword;
+    
+        }
+    
+        await User.findByIdAndUpdate(
+            req.userId, { $set: update }
+        ).then((result) => {
+            return res.status(200).json(result);
+        });
+
+    }
 
 })
 
