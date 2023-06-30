@@ -11,7 +11,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
     let id = req.params.id;
 
     const sitterExist = await Sitter.findOne({user_id: id});
-    if (!sitterExist) return res.status(422).json({ message: "No result!" })
+    if (!sitterExist) return res.status(200).json({ message: "No result!" })
 
     return res.status(200).json({sitterExist});
 
