@@ -113,18 +113,64 @@ router.post("/pet/add", authenticateToken, upload.single('image'), async (req, r
 
 })
 
-router.post("/pet/update/:id", authenticateToken, async (req, res) => {
+router.post("/pet/update/:id", authenticateToken, upload.single('image'), async (req, res) => {
 
     let id = req.params.id;
+
+    var body = JSON.parse(req.body.pet)
+
+    var update = {}
+    update = body;
+    
 
     const petExist = await Pet.findOne({_id: id, user_id: req.userId});
     if (!petExist) return res.status(422).json({ message: "No result!" })
 
-    await Pet.findByIdAndUpdate(
-        id, { $set: req.body }
-    ).then(() => {
-        return res.status(200).json({ message: "Pet updated successfully!" });
-    });
+    const file = req.file;
+
+    var fileName = ""
+    if (file) {
+
+        fileName = Date.now() + "_" + file.originalname;
+
+        const blob = imagesBucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            resumable: false,
+        })
+
+        blobStream.on("error", (err) => {
+            res.status(500).send({ message: err.message });
+        });
+
+        blobStream.on("finish", async (data) => {
+
+            const publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+
+            // Make the file public
+            await imagesBucket.file(fileName).makePublic();
+
+            update.photo = publicUrl;
+
+            await Pet.findByIdAndUpdate(
+                id, { $set: update }
+            ).then(() => {
+                return res.status(200).json({ message: "Pet updated successfully!" });
+            });
+
+        });
+      
+        blobStream.end(req.file.buffer);
+
+    }
+    else {
+
+        await Pet.findByIdAndUpdate(
+            id, { $set: update }
+        ).then(() => {
+            return res.status(200).json({ message: "Pet updated successfully!" });
+        });
+
+    }
 
 })
 
