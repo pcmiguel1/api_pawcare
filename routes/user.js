@@ -22,7 +22,7 @@ const upload = multer({ storage: multerStorage });
 const imagesBucket = gc.bucket('pawcare_imgs');
 
 
-router.post("/pet/add", authenticateToken, async (req, res) => {
+router.post("/pet/add", authenticateToken, upload.single('image'), async (req, res) => {
 
     const { name, specie, breed, gender, dateOfBirth, vaccinated, friendly, microchip } = req.body;
 
@@ -32,6 +32,41 @@ router.post("/pet/add", authenticateToken, async (req, res) => {
     if (!gender) return res.status(422).json({ message: 'Gender is required!' })
     if (!dateOfBirth) return res.status(422).json({ message: 'Date of birth is required!' })
 
+    const file = req.file;
+
+    var publicUrl = ""
+    var fileName = ""
+    if (file) {
+
+        fileName = Date.now() + "_" + file.originalname;
+
+        const blob = imagesBucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            resumable: false,
+        })
+
+        blobStream.on("error", (err) => {
+            res.status(500).send({ message: err.message });
+        });
+
+        blobStream.on("finish", async (data) => {
+
+            publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+
+            try {
+                // Make the file public
+                await imagesBucket.file(fileName).makePublic();
+
+            } catch (err) {
+                console.log(err);
+                res.status(400).json({ message: err });
+            }
+        });
+      
+        blobStream.end(req.file.buffer);
+
+    }
+
      //Create a new pet
      const pet = new Pet({
         user_id: req.userId,
@@ -40,7 +75,7 @@ router.post("/pet/add", authenticateToken, async (req, res) => {
         breed: breed || "",
         gender: gender,
         dateOfBirth: dateOfBirth,
-        photo: "",
+        photo: publicUrl,
         vaccinated: vaccinated || false,
         friendly: friendly || false,
         microchip: microchip || false
@@ -96,9 +131,9 @@ router.get("/pets", authenticateToken, async (req, res) => {
 
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
-    //var body = JSON.parse(req.body.user)
+    var body = JSON.parse(req.body.user)
 
-    var body = req.body
+    //var body = req.body
 
     var update = {}
     update = body;
