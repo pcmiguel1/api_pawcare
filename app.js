@@ -14,6 +14,7 @@ const bodyParser = require('body-parser');
 
 const authApp = require('./routes/auth');
 const userApp = require('./routes/user');
+const sitterApp = require('./routes/sitter');
 
 //APP
 
@@ -46,6 +47,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/auth', authApp);
 app.use('/api/user', userApp);
+app.use('/api/sitter', sitterApp);
 //app.use('/app/api/notification', notificationApp);
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
