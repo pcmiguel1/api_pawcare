@@ -83,7 +83,7 @@ router.post("/picture/delete/:filename", authenticateToken, async (req, res) => 
             if (err) {
                 res.json({ message: err.message });
             } else {
-                return res.status(200).json({ message: "Pet deleted successfully!" });
+                return res.status(200).json({ message: "Picture deleted successfully!" });
             }
         });
 
