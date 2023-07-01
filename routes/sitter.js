@@ -364,8 +364,11 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
             update.image = publicUrl;
     
             try {
+
+                await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
+
                 const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
-                //return res.status(200).json(updatedUser);
+                return res.status(200).json(updatedUser);
             } catch (err) {
                 console.log(err);
                 return res.status(400).json({ message: err });
@@ -376,13 +379,16 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
         blobStream.end(req.file.buffer);
 
     }
+    else {
 
-    try {
-        const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
-        return res.status(200).json(sitter);
-    } catch (err) {
-        console.log(err);
-        return res.status(400).json({ message: err });
+        try {
+            const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
+            return res.status(200).json(sitter);
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ message: err });
+        }
+
     }
 
 })
