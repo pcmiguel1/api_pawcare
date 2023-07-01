@@ -338,6 +338,8 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
 
     const file = req.file;
 
+    const result = {}
+
     var fileName = ""
     if (file) {
 
@@ -363,6 +365,7 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
     
             try {
                 const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
+                result = updatedUser;
                 return res.status(200).json(updatedUser);
             } catch (err) {
                 console.log(err);
@@ -377,7 +380,8 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
 
     try {
         const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
-        return res.status(200).json(sitter);
+        result = sitter;
+        return res.status(200).json(result);
     } catch (err) {
         console.log(err);
         return res.status(400).json({ message: err });
