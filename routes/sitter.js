@@ -338,7 +338,7 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
 
     const file = req.file;
 
-    const result = {}
+    var result = {}
 
     var fileName = ""
     if (file) {
@@ -364,9 +364,10 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
             update.image = publicUrl;
     
             try {
-                const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
-                result = updatedUser;
-                return res.status(200).json(updatedUser);
+                const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true }).then(() => {
+                    result = updatedUser;
+                    return res.status(200).json(updatedUser);
+                });
             } catch (err) {
                 console.log(err);
                 return res.status(400).json({ message: err });
@@ -379,9 +380,10 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
     }
 
     try {
-        const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
-        result = sitter;
-        return res.status(200).json(result);
+        const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true }).then(() => {
+            result = sitter;
+            return res.status(200).json(result);
+        });
     } catch (err) {
         console.log(err);
         return res.status(400).json({ message: err });
