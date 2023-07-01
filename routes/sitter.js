@@ -322,9 +322,9 @@ router.get("/", authenticateToken, async (req, res) => {
 
 })
 
-router.post("/update", authenticateToken, async (req, res) => {
+router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
-    const { headline, description, lat, long } = req.body;
+    const { headline, description, lat, long } = JSON.parse(req.body.sitter);
 
     var update = {}
 
@@ -336,7 +336,44 @@ router.post("/update", authenticateToken, async (req, res) => {
     if (lat != "" && lat != undefined) update.lat = lat
     if (long != "" && long != undefined) update.long = long
 
-    console.log(sitterExist._id)
+    const file = req.file;
+
+    var fileName = ""
+    if (file) {
+
+        fileName = Date.now() + "_" + file.originalname;
+
+        const blob = imagesBucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            resumable: false,
+        })
+
+        blobStream.on("error", (err) => {
+            res.status(500).send({ message: err.message });
+        });
+
+        blobStream.on("finish", async (data) => {
+
+            const publicUrl = `https://storage.googleapis.com/${imagesBucket.name}/${blob.name}`;
+
+            // Make the file public
+            await imagesBucket.file(fileName).makePublic();
+
+            update.image = publicUrl;
+    
+            try {
+                const updatedUser = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true });
+                return res.status(200).json(updatedUser);
+            } catch (err) {
+                console.log(err);
+                return res.status(400).json({ message: err });
+            }
+
+        });
+      
+        blobStream.end(req.file.buffer);
+
+    }
 
     try {
         const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
