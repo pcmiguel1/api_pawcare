@@ -232,9 +232,9 @@ router.post("/phone/verify", authenticateToken, async (req, res) => {
 
 })
 
-router.post("/phone/sendVerification", authenticateToken, async (req, res) => {
+router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (req, res) => {
 
-    const { phoneNumber } = req.body;
+    phoneNumber = req.params.phoneNumber;
 
     if (!phoneNumber) return res.status(422).json({ message: 'PhoneNumber is required!' })
 
