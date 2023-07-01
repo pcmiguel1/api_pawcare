@@ -322,4 +322,30 @@ router.get("/", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/update", authenticateToken, async (req, res) => {
+
+    const { headline, description, lat, long } = req.body;
+
+    var update = {}
+
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
+
+    if (headline != "" && headline != undefined) update.headline = headline
+    if (description != "" && description != undefined) update.description = description
+    if (lat != "" && lat != undefined) update.lat = lat
+    if (long != "" && long != undefined) update.long = long
+
+    console.log(sitterExist._id)
+
+    try {
+        const sitter = await Sitter.findByIdAndUpdate(sitterExist._id, { $set: update }, { new: true });
+        return res.status(200).json(sitter);
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ message: err });
+    }
+
+})
+
 module.exports = router;
