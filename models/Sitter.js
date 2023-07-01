@@ -8,6 +8,18 @@ const sitterSchema = new mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
+    },
+    headline: {
+        type: String
+    },
+    description: {
+        type: String
+    },
+    lat: {
+        type: String
+    },
+    long: {
+        type: String
     }
 });
 
