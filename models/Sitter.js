@@ -20,6 +20,9 @@ const sitterSchema = new mongoose.Schema({
     },
     long: {
         type: String
+    },
+    phone: {
+        type: String
     }
 });
 

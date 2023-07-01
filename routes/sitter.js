@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Pet = require('../models/Pet');
 const Sitter = require('../models/Sitter');
 const PictureImage = require('../models/PictureSitter');
+const PhoneVerification = require('../models/PhoneVerification');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -149,6 +150,164 @@ router.post("/picture/add", authenticateToken, upload.single('image'), async (re
 
     }
 
+
+})
+
+router.post("/phone/verify", authenticateToken, async (req, res) => {
+
+    const { phoneNumber, code } = req.body;
+
+    if (!phoneNumber) return res.status(422).json({ message: 'PhoneNumber is required!' })
+    if (!code) return res.status(422).json({ message: 'Code is required!' })
+
+    PhoneVerification
+    .find({userId: req.userId})
+    .then((result) => {
+        if (result.length > 0) {
+
+            // phone verification record exists so we proceed
+
+            const {expiresAt} = result[0];
+            const codeString = result[0].code; 
+
+            //checking for expired unique string
+            if (expiresAt < Date.now()) {
+
+                //record has expired so we delete it
+                PhoneVerification
+                .deleteOne({userId: req.userId})
+                .then((result) => {
+
+                    res.status(400).json({ message: "Verification Code not valid!" });
+
+                })
+                .catch((err) => {
+                    res.status(400).json({ message: err })
+                })
+
+            }
+            else {
+
+                //valid record exists so we validate the user string
+                
+                if (code == codeString) {
+
+                    Sitter
+                    .updateOne({user_id: req.userId}, {phone: phoneNumber})
+                    .then(() => {
+
+                        PhoneVerification
+                        .deleteOne({userId: req.userId})
+                        .then((result) => {
+
+                            res.status(200).json({ message: "Phone Number verified successfully!" });
+
+                        })
+                        .catch((err) => {
+                            res.status(400).json({ message: err })
+                        })
+
+                    })
+                    .catch((err) => {
+                        res.status(400).json({ message: err })
+                    })
+
+                }
+                else {
+                    // existing record but incorrect verification details passed
+                    res.status(400).json({ message: "Verification Code not valid!" })
+                }
+
+            }
+
+        }
+        else {
+            // existing record but incorrect verification details passed
+            res.status(400).json({ message: "Verification Code not valid!" })
+        }
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err })
+    })
+
+})
+
+router.post("/phone/sendVerification", authenticateToken, async (req, res) => {
+
+    const { phoneNumber } = req.body;
+
+    if (!phoneNumber) return res.status(422).json({ message: 'PhoneNumber is required!' })
+
+    const phoneExist = await Sitter.findOne({phone: phoneNumber});
+    if (phoneExist) return res.status(422).json({ message: "This phone number is already in use!" })
+
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
+
+    const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+
+    const newVerification = new PhoneVerification({
+        userId: req.userId,
+        code: randomNumber,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 3600000
+    });
+
+    PhoneVerification
+    .find({userId: req.userId})
+    .then((result) => {
+
+        if (result.length > 0) {
+
+            //phone verification record exists so delete and create a new one
+
+            PhoneVerification
+            .deleteOne({userId: req.userId})
+            .then((result) => {
+
+                newVerification
+                .save()
+                .then(() => {
+
+                    //send verification code 
+
+
+                    console.log(`Verification phone sent ${randomNumber}`)
+                    res.status(200).json({ message: "Verification Code Sent!" })
+
+                })
+                .catch((err) => {
+                    res.status(400).json({ message: err })
+                })
+
+            })
+            .catch((err) => {
+                res.status(400).json({ message: err })
+            })
+
+        } else {
+
+            newVerification
+            .save()
+            .then(() => {
+              
+                //send verification code 
+
+
+                console.log(`Verification phone sent ${randomNumber}`)
+                res.status(200).json({ message: "Verification Code Sent!" })
+
+            })
+            .catch((err) => {
+                res.status(400).json({ message: err })
+            })
+
+        }
+
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err })
+    })
 
 })
 
