@@ -324,7 +324,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
-    const { headline, description, lat, long } = JSON.parse(req.body.sitter);
+    const { headline, description, lat, long, sortcode, accountnumber } = JSON.parse(req.body.sitter);
 
     var update = {}
 
@@ -335,6 +335,8 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
     if (description != "" && description != undefined) update.description = description
     if (lat != "" && lat != undefined) update.lat = lat
     if (long != "" && long != undefined) update.long = long
+    if (sortcode != "" && sortcode != undefined) update.sortcode = sortcode
+    if (accountnumber != "" && accountnumber != undefined) update.accountnumber = accountnumber
 
     const file = req.file;
 

@@ -23,6 +23,12 @@ const sitterSchema = new mongoose.Schema({
     },
     phone: {
         type: String
+    },
+    sortcode: {
+        type: String
+    },
+    accountnumber: {
+        type: String
     }
 });
 
