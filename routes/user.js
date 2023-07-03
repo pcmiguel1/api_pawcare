@@ -236,7 +236,7 @@ router.post("/favourite/delete/:id", authenticateToken, async (req, res) => {
     const favouriteExist = await FavouriteSitter.findOne({user_id: req.userId, sitterId: id});
     if (!favouriteExist) return res.status(422).json({ message: "No result!" })
 
-    FavouriteSitter.findByIdAndDelete(id, (err, result) => {
+    FavouriteSitter.findByIdAndDelete(favouriteExist._id, (err, result) => {
         if (err) {
             res.json({ message: err.message });
         } else {
