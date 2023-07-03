@@ -95,38 +95,45 @@ router.get("/pictures", authenticateToken, async (req, res) => {
 })
 
 router.get("/list", authenticateToken, async (req, res) => {
-
     const { latitude, longitude } = req.body;
 
-    var result = []
+    try {
+        const sitters = await Sitter.find({ verified: true });
 
-    const sitters = await Sitter.find({verified: true});
-    if (!sitters) return res.status(422).json({ message: "No results!" })
+        if (!sitters || sitters.length === 0) {
+            return res.status(422).json({ message: "No results!" });
+        }
 
-    if (latitude != undefined && longitude != undefined) {
+        const result = await Promise.all(
+            sitters.map(async (sitter) => {
+                const { lat, long, user_id } = sitter;
 
-        const sitterData = sitters.map(sitter => {
-            const { lat, long } = sitter;
-           
-            const distance = calculateDistance(latitude, longitude, lat, long);
-            if (distance <= 20) {
-    
-                result.push(sitter);
-    
-            }
-    
-        });
+                const object = { ...sitter._doc };
 
-        return res.status(200).json(result);
+                if (latitude !== undefined && longitude !== undefined) {
+                    const distance = calculateDistance(latitude, longitude, lat, long);
+                    if (distance <= 20) {
+                        const user = await User.findById(user_id);
+                        object.name = user.fullname;
+                        object.image = user.image;
+                        return object;
+                    }
+                } else {
+                    const user = await User.findById(user_id);
+                    object.name = user.fullname;
+                    object.image = user.image;
+                    return object;
+                }
+            })
+        );
 
+        const filteredResult = result.filter(Boolean); // Remove any null or undefined values
+
+        return res.status(200).json(filteredResult);
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error" });
     }
-    else {
-
-        return res.status(200).json(sitters);
-
-    }
-
-})
+});
 
 router.post("/picture/delete/:filename", authenticateToken, async (req, res) => {
 
