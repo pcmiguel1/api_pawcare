@@ -94,6 +94,40 @@ router.get("/pictures", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/list", authenticateToken, async (req, res) => {
+
+    const { latitude, longitude } = req.body;
+
+    var result = []
+
+    const sitters = await Sitter.find({verified: true});
+    if (!sitters) return res.status(422).json({ message: "No results!" })
+
+    if (latitude != undefined && longitude != undefined) {
+
+        const sitterData = sitters.map(sitter => {
+            const { lat, long } = sitter;
+           
+            const distance = calculateDistance(latitude, longitude, lat, long);
+            if (distance <= 20) {
+    
+                result.push(sitter);
+    
+            }
+    
+        });
+
+        return res.status(200).json(result);
+
+    }
+    else {
+
+        return res.status(200).json(sitters);
+
+    }
+
+})
+
 router.post("/picture/delete/:filename", authenticateToken, async (req, res) => {
 
     let filename = req.params.filename;
@@ -470,5 +504,25 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
     }
 
 })
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+
+    return distance;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
 
 module.exports = router;
