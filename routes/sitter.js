@@ -4,6 +4,7 @@ const Pet = require('../models/Pet');
 const Sitter = require('../models/Sitter');
 const PictureImage = require('../models/PictureSitter');
 const PhoneVerification = require('../models/PhoneVerification');
+const ApplicationSitter = require('../models/ApplicationSitter');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -48,9 +49,28 @@ router.post("/application/start", authenticateToken, async (req, res) => {
 
 })
 
-router.post("/application/send", authenticateToken, async (req, res) => {
+router.post("/application/submit", authenticateToken, async (req, res) => {
 
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
 
+    const applicationSitter = new ApplicationSitter({
+        user_id: req.userId,
+        sitterId: sitterExist._id
+    });
+
+    try {
+        await applicationSitter.save()
+        .then((result) => {
+            return res.status(200).json(result);
+        })
+        .catch((err) => {
+            res.status(400).json({ message: err });
+        })
+
+    } catch(err) {
+        res.status(400).json({ message: err });
+    }
 
 })
 
