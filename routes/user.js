@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const User = require('../models/User');
 const Pet = require('../models/Pet');
+const FavouriteSitter = require('../models/FavouriteSitter');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -194,7 +195,54 @@ router.get("/pets", authenticateToken, async (req, res) => {
     const pets = await Pet.find({ user_id: req.userId });
     //if (pets.length === 0) return res.status(200).json({ message: 'There are no pets!' });
 
-    res.status(200).json(pets)
+    return res.status(200).json(pets)
+
+})
+
+router.get("/favourites", authenticateToken, async (req, res) => {
+
+    const favourites = await FavouriteSitter.find({ user_id: req.userId });
+
+    return res.status(200).json(favourites)
+
+})
+
+router.post("/favourite/add/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    const favouriteExist = await FavouriteSitter.findOne({user_id: req.userId, sitterId: id});
+    if (favouriteExist) return res.status(400).json({ message: "Favourite already exists!" })
+
+    //Create a new pet
+    const favourite = new FavouriteSitter({
+        user_id: req.userId,
+        sitterId: id
+    });
+
+    try {
+        const savedFavourite = await favourite.save();
+        return res.status(200).json(savedFavourite);
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
+
+})
+
+router.post("/favourite/delete/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    const favouriteExist = await FavouriteSitter.findOne({user_id: req.userId, sitterId: id});
+    if (!favouriteExist) return res.status(422).json({ message: "No result!" })
+
+    FavouriteSitter.findByIdAndDelete(id, (err, result) => {
+        if (err) {
+            res.json({ message: err.message });
+        } else {
+            return res.status(200).json({ message: "Favourite deleted successfully!" });
+        }
+    });
 
 })
 
