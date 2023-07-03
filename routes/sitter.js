@@ -79,7 +79,7 @@ router.get("/application", authenticateToken, async (req, res) => {
     const sitterExist = await Sitter.findOne({user_id: req.userId});
     if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
 
-    const applicationSitter = await ApplicationSitter.find({user_id: req.userId});
+    const applicationSitter = await ApplicationSitter.findOne({user_id: req.userId});
     return res.status(200).json(applicationSitter);
 
 })
