@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/User');
 const Pet = require('../models/Pet');
 const FavouriteSitter = require('../models/FavouriteSitter');
+const Sitter = require('../models/Sitter');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -203,7 +204,15 @@ router.get("/favourites", authenticateToken, async (req, res) => {
 
     const favourites = await FavouriteSitter.find({ user_id: req.userId });
 
-    return res.status(200).json(favourites)
+    const result = [];
+
+    for (const favourite of favourites) {
+        console.log(favourite.sitterId)
+      const sitter = await Sitter.findById(favourite.sitterId);
+      result.push(sitter);
+    }
+
+    return res.status(200).json(result);
 
 })
 
