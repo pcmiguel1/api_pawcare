@@ -94,6 +94,18 @@ router.get("/pictures", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/pictures/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    const sitterExist = await Sitter.findOne({user_id: id});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
+
+    const pictures = await PictureImage.find({user_id: id});
+    return res.status(200).json(pictures);
+
+})
+
 router.get("/list", authenticateToken, async (req, res) => {
     const { latitude, longitude } = req.body;
 
