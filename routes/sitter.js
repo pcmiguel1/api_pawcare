@@ -324,7 +324,32 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
-    const { headline, description, lat, long, sortcode, accountnumber } = JSON.parse(req.body.sitter);
+    const { 
+        headline, 
+        description, 
+        lat, 
+        long, 
+        sortcode, 
+        accountnumber,
+        petwalking,
+        ratewalking,
+        ratewalkingaddpet,
+        petboarding,
+        ratepetboarding,
+        ratepetboardingaddpet,
+        housesitting,
+        ratehousesitting,
+        ratehousesittingaddpet,
+        training,
+        ratetraining,
+        ratetrainingaddpet,
+        grooming,
+        rategrooming,
+        rategroomingaddpet,
+        pickupdropoff,
+        oralmedications,
+        injectmedications
+    } = JSON.parse(req.body.sitter);
 
     var update = {}
 
@@ -337,6 +362,25 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
     if (long != "" && long != undefined) update.long = long
     if (sortcode != "" && sortcode != undefined) update.sortcode = sortcode
     if (accountnumber != "" && accountnumber != undefined) update.accountnumber = accountnumber
+
+    if (petwalking != "" && petwalking != undefined) update.petwalking = petwalking
+    if (ratewalking != "" && ratewalking != undefined) update.ratewalking = ratewalking
+    if (ratewalkingaddpet != "" && ratewalkingaddpet != undefined) update.ratewalkingaddpet = ratewalkingaddpet
+    if (petboarding != "" && petboarding != undefined) update.petboarding = petboarding
+    if (ratepetboarding != "" && ratepetboarding != undefined) update.ratepetboarding = ratepetboarding
+    if (ratepetboardingaddpet != "" && ratepetboardingaddpet != undefined) update.ratepetboardingaddpet = ratepetboardingaddpet
+    if (housesitting != "" && housesitting != undefined) update.housesitting = housesitting
+    if (ratehousesitting != "" && ratehousesitting != undefined) update.ratehousesitting = ratehousesitting
+    if (ratehousesittingaddpet != "" && ratehousesittingaddpet != undefined) update.ratehousesittingaddpet = ratehousesittingaddpet
+    if (training != "" && training != undefined) update.training = training
+    if (ratetraining != "" && ratetraining != undefined) update.ratetraining = ratetraining
+    if (ratetrainingaddpet != "" && ratetrainingaddpet != undefined) update.ratetrainingaddpet = ratetrainingaddpet
+    if (grooming != "" && grooming != undefined) update.grooming = grooming
+    if (rategrooming != "" && rategrooming != undefined) update.rategrooming = rategrooming
+    if (rategroomingaddpet != "" && rategroomingaddpet != undefined) update.rategroomingaddpet = rategroomingaddpet
+    if (pickupdropoff != "" && pickupdropoff != undefined) update.pickupdropoff = pickupdropoff
+    if (oralmedications != "" && oralmedications != undefined) update.oralmedications = oralmedications
+    if (injectmedications != "" && injectmedications != undefined) update.injectmedications = injectmedications
 
     const file = req.file;
 
