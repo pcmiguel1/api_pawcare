@@ -246,6 +246,17 @@ router.post("/favourite/delete/:id", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/favourite/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    const favourite = await FavouriteSitter.findOne({ user_id: req.userId, sitterId: id });
+    if (!favourite) return res.status(422).json({ message: "No result!" })
+
+    return res.status(200).json(favourite)
+
+})
+
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
     var body = JSON.parse(req.body.user)
