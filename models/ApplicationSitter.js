@@ -15,4 +15,4 @@ const applicationSitterSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('ApplicationSitter', applicationSitter);
+module.exports = mongoose.model('ApplicationSitter', applicationSitterSchema);
