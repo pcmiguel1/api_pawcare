@@ -207,9 +207,16 @@ router.get("/favourites", authenticateToken, async (req, res) => {
     const result = [];
 
     for (const favourite of favourites) {
-        console.log(favourite.sitterId)
-      const sitter = await Sitter.findById(favourite.sitterId);
-      result.push(sitter);
+        const sitter = await Sitter.findById(favourite.sitterId);
+
+        const object = { ...sitter._doc };
+
+        const user = await User.findById(favourite.user_id);
+
+        object.image = user.image;
+        object.name = user.fullname
+
+        result.push(object);
     }
 
     return res.status(200).json(result);
