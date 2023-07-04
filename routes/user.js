@@ -302,14 +302,12 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
 
         for (const pet of pets) {
 
-            console.log(pet)
-
-            /*const petbooking = new PetBookings({
+            const petbooking = new PetBookings({
                 bookingId: bookingsaved._id,
-                petId: pet
-            });*/
+                petId: pet.id
+            });
 
-            //await petbooking.save();
+            await petbooking.save();
 
         }
         return res.status(200).json({ message: 'Booking submitted successfully!' });
