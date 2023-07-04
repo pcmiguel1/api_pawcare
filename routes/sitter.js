@@ -418,6 +418,16 @@ router.get("/", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/:id", authenticateToken, async (req, res) => {
+
+    let id = req.params.id;
+
+    const sitterExist = await Sitter.findOne({sitterId: id});
+
+    return res.status(200).json(sitterExist);
+
+})
+
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
     const { 
