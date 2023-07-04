@@ -318,6 +318,58 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/bookings/active", authenticateToken, async (req, res) => {
+
+    const bookings = await Bookings.find({ user_id: req.userId });
+
+    const result = [];
+
+    for (const booking of bookings) {
+
+        if (booking.status != "completed") {
+            const sitter = await Sitter.findById(booking.sitterId);
+
+            const object = { ...booking._doc };
+
+            const user = await User.findById(sitter.user_id);
+
+            object.image = user.image;
+            object.name = user.fullname
+
+            result.push(object);
+        }
+    }
+
+    return res.status(200).json(result);
+
+})
+
+router.get("/bookings/completed", authenticateToken, async (req, res) => {
+
+    const bookings = await Bookings.find({ user_id: req.userId });
+
+    const result = [];
+
+    for (const booking of bookings) {
+
+        if (booking.status == "completed") {
+            const sitter = await Sitter.findById(booking.sitterId);
+
+            const object = { ...booking._doc };
+
+            const user = await User.findById(sitter.user_id);
+
+            object.image = user.image;
+            object.name = user.fullname
+
+            result.push(object);
+        }
+    }
+
+    return res.status(200).json(result);
+
+})
+
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
     var body = JSON.parse(req.body.user)
