@@ -8,7 +8,7 @@ const petbookingsSchema = new mongoose.Schema({
     petId: {
         type: String,
         required: true
-    },
+    }
 });
 
 module.exports = mongoose.model('PetBookings', petbookingsSchema);

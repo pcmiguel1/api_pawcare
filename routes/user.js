@@ -287,9 +287,6 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
     if (!location) return res.status(422).json({ message: 'location is required!' })
     if (!pets) return res.status(422).json({ message: 'pets is required!' })
 
-    console.log(pets);
-
-    //Create a new pet
     const booking = new Bookings({
         user_id: req.userId,
         sitterId: sitterId,
@@ -301,7 +298,18 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
     });
 
     try {
-        await booking.save();
+        const bookingsaved = await booking.save();
+
+        for (const pet of pets) {
+
+            const petbooking = new PetBookings({
+                bookingId: bookingsaved._id,
+                petId: pet
+            });
+
+            await petbooking.save();
+
+        }
         return res.status(200).json({ message: 'Booking submitted successfully!' });
     } catch (err) {
         return res.status(400).json({ message: err });
