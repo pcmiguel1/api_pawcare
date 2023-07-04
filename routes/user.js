@@ -292,7 +292,7 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
     //Create a new pet
     const booking = new Bookings({
         user_id: req.userId,
-        sitterId: id,
+        sitterId: sitterId,
         startDate: startDate,
         endDate: endDate,
         serviceType: serviceType,
