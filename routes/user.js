@@ -370,6 +370,16 @@ router.get("/bookings/completed", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/delete", authenticateToken, async (req, res) => {
+
+    await User.findByIdAndUpdate(
+        req.userId, { deleted: true } , { new: true }
+    ).then((result) => {
+        return res.status(200).json({ message: 'User deleted successfully!' });
+    });
+
+})
+
 router.post("/update", authenticateToken, upload.single('image'), async (req, res) => {
 
     var body = JSON.parse(req.body.user)
