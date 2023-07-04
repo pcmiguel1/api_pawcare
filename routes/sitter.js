@@ -5,6 +5,7 @@ const Sitter = require('../models/Sitter');
 const PictureImage = require('../models/PictureSitter');
 const PhoneVerification = require('../models/PhoneVerification');
 const ApplicationSitter = require('../models/ApplicationSitter');
+const Reviews = require('../models/Reviews');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -24,6 +25,7 @@ const multerStorage = multer.memoryStorage();
 const upload = multer({ storage: multerStorage });
 
 const imagesBucket = gc.bucket('pawcare_imgs');
+
 
 router.post("/application/start", authenticateToken, async (req, res) => {
 
@@ -391,6 +393,17 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
     .catch((err) => {
         res.status(400).json({ message: err })
     })
+
+})
+
+router.get("/:id/reviews", async (req, res) => {
+
+    let id = req.params.id;
+
+    const reviews = await Reviews.find({sitterId: id});
+    return res.status(200).json(reviews);
+
+
 
 })
 

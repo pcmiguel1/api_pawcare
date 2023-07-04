@@ -3,6 +3,8 @@ const User = require('../models/User');
 const Pet = require('../models/Pet');
 const FavouriteSitter = require('../models/FavouriteSitter');
 const Sitter = require('../models/Sitter');
+const Bookings = require('../models/Bookings');
+const PetBookings = require('../models/PetBookings');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -270,6 +272,41 @@ router.get("/favourite/:id", authenticateToken, async (req, res) => {
     if (!favourite) return res.status(422).json({ message: "No result!" })
 
     return res.status(200).json(favourite)
+
+})
+
+router.post("/booking/add", authenticateToken, async (req, res) => {
+
+    const { sitterId, serviceType, startDate, endDate, location, message, pets } = req.body;
+
+    //Validations
+    if (!sitterId) return res.status(422).json({ message: 'sitterId is required!' })
+    if (!serviceType) return res.status(422).json({ message: 'serviceType is required!' })
+    if (!startDate) return res.status(422).json({ message: 'startDate is required!' })
+    if (!endDate) return res.status(422).json({ message: 'endDate is required!' })
+    if (!location) return res.status(422).json({ message: 'location is required!' })
+    if (!pets) return res.status(422).json({ message: 'pets is required!' })
+
+    console.log(pets);
+
+    //Create a new pet
+    const booking = new Bookings({
+        user_id: req.userId,
+        sitterId: id,
+        startDate: startDate,
+        endDate: endDate,
+        serviceType: serviceType,
+        location: location,
+        message: message || ""
+    });
+
+    try {
+        await booking.save();
+        return res.status(200).json({ message: 'Booking submitted successfully!' });
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
+
 
 })
 
