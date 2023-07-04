@@ -422,7 +422,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
 
-    const sitterExist = await Sitter.findOne({sitterId: id});
+    const sitterExist = await Sitter.findById(id);
 
     return res.status(200).json(sitterExist);
 
