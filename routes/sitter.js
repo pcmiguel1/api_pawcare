@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Pet = require('../models/Pet');
 const Sitter = require('../models/Sitter');
 const PictureImage = require('../models/PictureSitter');
+const Bookings = require('../models/Bookings');
 const PhoneVerification = require('../models/PhoneVerification');
 const ApplicationSitter = require('../models/ApplicationSitter');
 const Reviews = require('../models/Reviews');
@@ -175,6 +176,17 @@ router.get("/list", authenticateToken, async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 });
+
+router.get("/bookings", authenticateToken, async (req, res) => {
+
+
+    const sitter = await Sitter.findOne({ user_id: req.userId });
+
+    const bookings = await Bookings.find({ sitterId: sitter._id });
+
+    return res.status(200).json(bookings);
+
+})
 
 router.post("/picture/delete/:filename", authenticateToken, async (req, res) => {
 
