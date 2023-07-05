@@ -124,7 +124,6 @@ router.get("/list", authenticateToken, async (req, res) => {
         }
 
         for (const serv of serviceArray) {
-            console.log("Service is defined:", serv);
             if (serv == "petwalking") find.petwalking = true
             if (serv == "training") find.training = true
             if (serv == "petboarding") find.petboarding = true
