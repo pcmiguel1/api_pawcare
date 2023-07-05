@@ -112,10 +112,18 @@ router.get("/list", authenticateToken, async (req, res) => {
     
     const { latitude, longitude, service } = req.query;
 
-    console.log(service);
+    var find = {}
+
+    for (const serv of service) {
+        if (serv == "petwalking") find.petwalking = true
+        if (serv == "training") find.training = true
+        if (serv == "petboarding") find.petboarding = true
+        if (serv == "grooming") find.grooming = true 
+        if (serv == "housesitting") find.housesitting = true
+    }
 
     try {
-        const sitters = await Sitter.find({ verified: true });
+        const sitters = await Sitter.find({ verified: true, ...find });
 
         if (!sitters || sitters.length === 0) {
             return res.status(422).json({ message: "No results!" });
