@@ -112,6 +112,8 @@ router.get("/list", authenticateToken, async (req, res) => {
     
     const { latitude, longitude, service } = req.query;
 
+    console.log(service);
+
     try {
         const sitters = await Sitter.find({ verified: true });
 
