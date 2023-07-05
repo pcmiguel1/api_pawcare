@@ -123,7 +123,12 @@ router.get("/list", authenticateToken, async (req, res) => {
     }
 
     try {
-        const sitters = await Sitter.find({ verified: true, ...(Object.keys(find).length !== 0 && find) });
+        let sitters;
+        if (Object.keys(find).length !== 0) {
+        sitters = await Sitter.find({ verified: true, ...find });
+        } else {
+        sitters = await Sitter.find({ verified: true });
+        }
 
         if (!sitters || sitters.length === 0) {
             return res.status(422).json({ message: "No results!" });
