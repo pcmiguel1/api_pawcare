@@ -108,7 +108,7 @@ router.get("/pictures/:id", authenticateToken, async (req, res) => {
 
 })
 
-router.get("/list", authenticateToken, async (req, res) => {
+router.get("/list/:latitude/:longitude", authenticateToken, async (req, res) => {
     
     var latitude = req.params.latitude;
     var longitude = req.params.longitude;
