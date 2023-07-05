@@ -422,9 +422,21 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
 
+    var result = {};
+
     const sitterExist = await Sitter.findById(id);
 
-    return res.status(200).json(sitterExist);
+    const object = { ...sitterExist._doc };
+
+    const user = await User.findById(sitterExist.user_id);
+
+    object.image = user.image;
+    object.name = user.fullname
+
+    result = object;
+
+
+    return res.status(200).json(result);
 
 })
 
