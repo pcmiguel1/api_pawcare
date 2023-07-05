@@ -132,6 +132,8 @@ router.get("/list", authenticateToken, async (req, res) => {
         }
     }
 
+    console.log(find)
+
     try {
         let sitters;
         if (Object.keys(find).length !== 0) {
