@@ -114,12 +114,23 @@ router.get("/list", authenticateToken, async (req, res) => {
 
     var find = {}
 
-    for (const serv of service) {
-        if (serv == "petwalking") find.petwalking = true
-        if (serv == "training") find.training = true
-        if (serv == "petboarding") find.petboarding = true
-        if (serv == "grooming") find.grooming = true 
-        if (serv == "housesitting") find.housesitting = true
+    if (service != undefined) {
+
+        let serviceArray = [];
+        if (typeof service === "string") {
+            serviceArray.push(service); // Convert the string to an array
+        } else if (Array.isArray(service)) {
+            serviceArray = service; // Use the existing array
+        }
+
+        for (const serv of serviceArray) {
+            console.log("Service is defined:", serv);
+            if (serv == "petwalking") find.petwalking = true
+            if (serv == "training") find.training = true
+            if (serv == "petboarding") find.petboarding = true
+            if (serv == "grooming") find.grooming = true 
+            if (serv == "housesitting") find.housesitting = true
+        }
     }
 
     try {
