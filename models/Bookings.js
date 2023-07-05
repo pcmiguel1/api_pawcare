@@ -23,7 +23,7 @@ const bookingsSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        default: "pedding"
+        default: "pending"
     },
     location: {
         type: String

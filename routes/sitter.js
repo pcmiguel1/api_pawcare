@@ -110,8 +110,7 @@ router.get("/pictures/:id", authenticateToken, async (req, res) => {
 
 router.get("/list/:latitude/:longitude", authenticateToken, async (req, res) => {
     
-    var latitude = req.params.latitude;
-    var longitude = req.params.longitude;
+    const { latitude, longitude, service } = req.query;
 
     try {
         const sitters = await Sitter.find({ verified: true });
