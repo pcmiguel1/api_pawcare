@@ -124,7 +124,7 @@ router.get("/list", authenticateToken, async (req, res) => {
 
                 const object = { ...sitter._doc };
 
-                if (latitude !== undefined && longitude !== undefined) {
+                if (latitude !== undefined && latitude != "" && longitude !== undefined && longitude != "") {
                     const distance = calculateDistance(latitude, longitude, lat, long);
                     if (distance <= 20) {
                         const user = await User.findById(user_id);
