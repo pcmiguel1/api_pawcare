@@ -132,12 +132,11 @@ router.get("/list", authenticateToken, async (req, res) => {
         }
     }
 
-    console.log(find)
-
     try {
         let sitters;
         if (Object.keys(find).length !== 0) {
-        sitters = await Sitter.find({ verified: true, ...find });
+            const query = { verified: true, $or: Object.entries(find).map(([key, value]) => ({ [key]: value })) };
+            sitters = await Sitter.find(query);
         } else {
         sitters = await Sitter.find({ verified: true });
         }
