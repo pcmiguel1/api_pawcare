@@ -184,6 +184,15 @@ router.get("/bookings", authenticateToken, async (req, res) => {
 
     const bookings = await Bookings.find({ sitterId: sitter._id });
 
+    bookings.sort((a, b) => {
+        const dateA = new Date(a.startDate.split("-").reverse().join("-"));
+        const dateB = new Date(b.startDate.split("-").reverse().join("-"));
+        return dateA - dateB;
+      });
+    
+      console.log(bookings.map(booking => booking.startDate)); // Sorted array of startDate values
+    
+
     return res.status(200).json(bookings);
 
 })
