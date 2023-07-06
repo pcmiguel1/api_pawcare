@@ -6,6 +6,7 @@ const PictureImage = require('../models/PictureSitter');
 const Bookings = require('../models/Bookings');
 const PhoneVerification = require('../models/PhoneVerification');
 const ApplicationSitter = require('../models/ApplicationSitter');
+const Messages = require('../models/Messages');
 const Reviews = require('../models/Reviews');
 const Contacts = require('../models/Contacts');
 const jwt = require('jsonwebtoken');
