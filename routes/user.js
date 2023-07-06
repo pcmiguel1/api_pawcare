@@ -6,6 +6,7 @@ const Sitter = require('../models/Sitter');
 const Bookings = require('../models/Bookings');
 const PetBookings = require('../models/PetBookings');
 const Contacts = require('../models/Contacts');
+const Messages = require('../models/Messages');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -516,6 +517,69 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
         });
 
     }
+
+})
+
+router.post("/chat/send", authenticateToken, async (req, res) => {
+
+    const { message, senderId, senderName, receiverId, receiverName } = req.body;
+    
+    //Validations
+    if (!message) return res.status(422).json({ message: 'message is required!' })
+    if (!senderId) return res.status(422).json({ message: 'senderId is required!' })
+    if (!senderName) return res.status(422).json({ message: 'senderName is required!' })
+    if (!receiverId) return res.status(422).json({ message: 'receiverId is required!' })
+    if (!receiverName) return res.status(422).json({ message: 'receiverName is required!' })
+
+    const chat = new Messages({
+        message: message,
+        sender: {
+            id: senderId,
+            name: senderName
+        },
+        receiver: {
+            id: receiverId,
+            name: receiverName
+        }
+    });
+
+    try {
+        const savedchat = await chat.save();
+        return res.status(200).json({ message: "Message sent!" });
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
+
+})
+
+router.get("/chat/messages/:id", authenticateToken, async (req, res) => {
+
+    var receiver = req.params.id;
+
+    const messages = await Messages.find({
+        $or: [{
+            "sender.id": req.userId,
+            "receiver.id": receiver
+        }, {
+            "sender.id": receiver,
+            "receiver.id": req.userId
+        }]
+    }).sort({
+        createdat: -1
+    }).toArray();
+
+    const data = []
+
+    for (const message of messages) {
+
+        const object = { ...message._doc };
+
+        data.push(object);
+    }
+
+    data.reverse();
+
+    return res.status(200).json(data);
 
 })
 
