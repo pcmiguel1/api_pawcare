@@ -22,7 +22,13 @@ module.exports = {
         if (token == null) return res.sendStatus(401)
 
         jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
-            if (err) return res.sendStatus(403)
+            if (err) {
+                if (err.name === 'TokenExpiredError') {
+                    return res.sendStatus(401); // Token expired
+                } else {
+                    return res.sendStatus(403); // Invalid token
+                }
+            }
             req.userId = user._id
             next();
         })
