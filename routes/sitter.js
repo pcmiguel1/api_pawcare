@@ -201,7 +201,60 @@ router.get("/bookings", authenticateToken, async (req, res) => {
     console.log(bookings.map(booking => booking.startDate)); // Sorted array of startDate values within the specified month and year
   
     return res.status(200).json(bookings);
-  });
+});
+
+router.post("/booking/update/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    let booking = await Bookings.findById(id);
+
+    var update = {}
+
+    const currentTime = new Date();
+    const hours = currentTime.getHours().toString().padStart(2, '0');
+    const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+
+    if (!booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
+
+        update.petpicketup = true
+        update.timepetpicketup = `${hours}:${minutes}`
+
+    }
+
+    if (booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
+
+        update.inprogress = true
+        update.timeinprogress = `${hours}:${minutes}`
+
+    }
+
+    if (booking.petpicketup && booking.inprogress && !booking.returning && !booking.completed) {
+
+        update.returning = true
+        update.timereturning = `${hours}:${minutes}`
+
+    }
+
+    if (booking.petpicketup && booking.inprogress && booking.returning && !booking.completed) {
+
+        update.completed = true
+        update.timecompleted = `${hours}:${minutes}`
+
+    }
+    
+
+    try {
+        await Bookings.findByIdAndUpdate(id, { $set: update }, { new: true });
+        return res.status(200).json({message: "State updated!"});
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ message: err });
+    }
+
+
+
+})  
 
 router.post("/picture/delete/:filename", authenticateToken, async (req, res) => {
 
