@@ -240,6 +240,7 @@ router.post("/booking/update/:id", authenticateToken, async (req, res) => {
 
         update.completed = true
         update.timecompleted = `${hours}:${minutes}`
+        update.status = "completed"
 
     }
     
