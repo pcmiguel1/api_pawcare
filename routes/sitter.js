@@ -178,24 +178,30 @@ router.get("/list", authenticateToken, async (req, res) => {
 });
 
 router.get("/bookings", authenticateToken, async (req, res) => {
-
-
+    const { month, year } = req.query;
+  
     const sitter = await Sitter.findOne({ user_id: req.userId });
+  
+    let bookings = await Bookings.find({ sitterId: sitter._id });
+  
+    bookings = bookings.filter(booking => {
+      const [bookingDay, bookingMonth, bookingYear] = booking.startDate.split("-");
 
-    const bookings = await Bookings.find({ sitterId: sitter._id });
+        console.log(bookingMonth + " " + bookingYear)
 
+      return Number(bookingMonth) === Number(month) && Number(bookingYear) === Number(year);
+    });
+  
     bookings.sort((a, b) => {
-        const dateA = new Date(a.startDate.split("-").reverse().join("-"));
-        const dateB = new Date(b.startDate.split("-").reverse().join("-"));
-        return dateA - dateB;
-      });
-    
-      console.log(bookings.map(booking => booking.startDate)); // Sorted array of startDate values
-    
-
+      const dateA = new Date(a.startDate.split("-").reverse().join("-"));
+      const dateB = new Date(b.startDate.split("-").reverse().join("-"));
+      return dateA - dateB;
+    });
+  
+    console.log(bookings.map(booking => booking.startDate)); // Sorted array of startDate values within the specified month and year
+  
     return res.status(200).json(bookings);
-
-})
+  });
 
 router.post("/picture/delete/:filename", authenticateToken, async (req, res) => {
 
