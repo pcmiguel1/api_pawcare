@@ -595,6 +595,42 @@ router.post("/chat/send", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/chat/messages/:id", authenticateToken, async (req, res) => {
+
+    var receiver = req.params.id;
+
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+
+    const messages = await Messages.find({
+        $or: [
+          {
+            "sender.id": sitterExist._id.toString(),
+            "receiver.id": receiver
+          },
+          {
+            "sender.id": receiver,
+            "receiver.id": sitterExist._id.toString()
+          }
+        ]
+      })
+        .sort({ createdat: -1 })
+        .exec();
+
+    const data = []
+
+    for (const message of messages) {
+
+        const object = { ...message._doc };
+
+        data.push(object);
+    }
+
+    data.reverse();
+
+    return res.status(200).json(data);
+
+})
+
 router.get("/:id", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
