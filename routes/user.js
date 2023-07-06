@@ -275,6 +275,20 @@ router.get("/favourite/:id", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/booking/cancel/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    try {
+        await Bookings.findByIdAndUpdate(id, { status: "canceled" }, { new: true });
+        return res.status(200).json({message: "State updated!"});
+    } catch (err) {
+        console.log(err);
+        return res.status(400).json({ message: err });
+    }
+
+})  
+
 router.post("/booking/add", authenticateToken, async (req, res) => {
 
     const { sitterId, serviceType, startDate, endDate, location, message, pets, total } = req.body;
@@ -354,7 +368,7 @@ router.get("/bookings/completed", authenticateToken, async (req, res) => {
 
     for (const booking of bookings) {
 
-        if (booking.status == "completed") {
+        if (booking.status == "completed" || booking.status == "canceled") {
             const sitter = await Sitter.findById(booking.sitterId);
 
             const object = { ...booking._doc };
