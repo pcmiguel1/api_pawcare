@@ -7,6 +7,7 @@ const Bookings = require('../models/Bookings');
 const PhoneVerification = require('../models/PhoneVerification');
 const ApplicationSitter = require('../models/ApplicationSitter');
 const Reviews = require('../models/Reviews');
+const Contacts = require('../models/Contacts');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -106,6 +107,16 @@ router.get("/pictures/:id", authenticateToken, async (req, res) => {
 
     const pictures = await PictureImage.find({user_id: id});
     return res.status(200).json(pictures);
+
+})
+
+router.get("/contacts", authenticateToken, async (req, res) => {
+
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
+
+    const contacts = await Contacts.find({ sitterId: sitterExist._id });
+    return res.status(200).json(contacts);
 
 })
 

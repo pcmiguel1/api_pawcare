@@ -5,6 +5,7 @@ const FavouriteSitter = require('../models/FavouriteSitter');
 const Sitter = require('../models/Sitter');
 const Bookings = require('../models/Bookings');
 const PetBookings = require('../models/PetBookings');
+const Contacts = require('../models/Contacts');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
@@ -199,6 +200,34 @@ router.get("/pets", authenticateToken, async (req, res) => {
     //if (pets.length === 0) return res.status(200).json({ message: 'There are no pets!' });
 
     return res.status(200).json(pets)
+
+})
+
+router.post("/contacts/add/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    const contactExist = await Contacts.findOne({user_id: req.userId, sitterId: id});
+    if (contactExist) return res.status(400).json({ message: "Contact already exists!" })
+
+    const contact = new Contacts({
+        user_id: req.userId,
+        sitterId: id
+    });
+
+    try {
+        const savedContact = await contact.save();
+        return res.status(200).json({ message: "Contact added!" });
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
+
+})
+
+router.get("/contacts", authenticateToken, async (req, res) => {
+
+    const contacts = await Contacts.find({ user_id: req.userId });
+    return res.status(200).json(contacts);
 
 })
 
