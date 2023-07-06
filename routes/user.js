@@ -545,7 +545,7 @@ router.post("/chat/send", authenticateToken, async (req, res) => {
 
     try {
         const savedchat = await chat.save();
-        return res.status(200).json({ message: "Message sent!" });
+        return res.status(200).json(savedchat);
     } catch (err) {
         return res.status(400).json({ message: err });
     }
