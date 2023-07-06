@@ -557,16 +557,19 @@ router.get("/chat/messages/:id", authenticateToken, async (req, res) => {
     var receiver = req.params.id;
 
     const messages = await Messages.find({
-        $or: [{
+        $or: [
+          {
             "sender.id": req.userId,
             "receiver.id": receiver
-        }, {
+          },
+          {
             "sender.id": receiver,
             "receiver.id": req.userId
-        }]
-    }).sort({
-        createdat: -1
-    }).toArray();
+          }
+        ]
+      })
+        .sort({ createdat: -1 })
+        .exec();
 
     const data = []
 
