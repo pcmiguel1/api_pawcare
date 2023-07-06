@@ -560,6 +560,40 @@ router.get("/", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/chat/send", authenticateToken, async (req, res) => {
+
+    const { message, senderId, senderName, receiverId, receiverName } = req.body;
+    
+    //Validations
+    if (!message) return res.status(422).json({ message: 'message is required!' })
+    if (!senderId) return res.status(422).json({ message: 'senderId is required!' })
+    if (!senderName) return res.status(422).json({ message: 'senderName is required!' })
+    if (!receiverId) return res.status(422).json({ message: 'receiverId is required!' })
+    if (!receiverName) return res.status(422).json({ message: 'receiverName is required!' })
+
+    const sitterExist = await Sitter.findOne({user_id: senderId});
+
+    const chat = new Messages({
+        message: message,
+        sender: {
+            id: sitterExist._id,
+            name: senderName
+        },
+        receiver: {
+            id: receiverId,
+            name: receiverName
+        }
+    });
+
+    try {
+        const savedchat = await chat.save();
+        return res.status(200).json(savedchat);
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
+
+})
+
 router.get("/:id", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
