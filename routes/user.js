@@ -368,7 +368,7 @@ router.get("/bookings/completed", authenticateToken, async (req, res) => {
 
     for (const booking of bookings) {
 
-        if (booking.status == "completed" && booking.status == "canceled") {
+        if (booking.status == "completed" || booking.status == "canceled") {
             const sitter = await Sitter.findById(booking.sitterId);
 
             const object = { ...booking._doc };
