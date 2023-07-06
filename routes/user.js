@@ -213,7 +213,7 @@ router.get("/favourites", authenticateToken, async (req, res) => {
 
         const object = { ...sitter._doc };
 
-        const user = await User.findById(favourite.user_id);
+        const user = await User.findById(sitter.user_id);
 
         object.image = user.image;
         object.name = user.fullname
