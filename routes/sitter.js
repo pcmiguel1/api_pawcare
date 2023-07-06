@@ -577,7 +577,7 @@ router.post("/chat/send", authenticateToken, async (req, res) => {
     const chat = new Messages({
         message: message,
         sender: {
-            id: sitterExist._id,
+            id: sitterExist._id.toString(),
             name: senderName
         },
         receiver: {
