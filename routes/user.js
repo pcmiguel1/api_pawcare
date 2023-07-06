@@ -519,6 +519,14 @@ router.post("/update", authenticateToken, upload.single('image'), async (req, re
 
 })
 
+router.get("/:id", authenticateToken, async (req, res) => {
 
+    var id = req.params.id;
+
+    const user = await User.findById(id);
+
+    return res.status(200).json(user);
+
+})
 
 module.exports = router;
