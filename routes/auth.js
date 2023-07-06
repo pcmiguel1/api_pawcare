@@ -64,7 +64,7 @@ router.post("/login", authenticateToken, async (req, res) => {
                 const sitterExist = await Sitter.findOne({user_id: user._id.toString()});
 
                 //Create and assign a token
-                const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '10h', issuer: process.env.ISSUER_JWT });
+                const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '2m', issuer: process.env.ISSUER_JWT });
 
                 var resultUser = { ...user._doc };
                 if (sitterExist) resultUser.sitterId = sitterExist._id.toString()
