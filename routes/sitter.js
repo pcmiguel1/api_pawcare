@@ -215,35 +215,43 @@ router.post("/booking/update/:id", authenticateToken, async (req, res) => {
     const hours = currentTime.getHours().toString().padStart(2, '0');
     const minutes = currentTime.getMinutes().toString().padStart(2, '0');
 
-    if (!booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
+    if (booking.status == "pending") {
 
-        update.petpicketup = true
-        update.timepetpicketup = `${hours}:${minutes}`
-
-    }
-
-    if (booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
-
-        update.inprogress = true
-        update.timeinprogress = `${hours}:${minutes}`
+        update.status = "started"
 
     }
+    else {
 
-    if (booking.petpicketup && booking.inprogress && !booking.returning && !booking.completed) {
+        if (!booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
 
-        update.returning = true
-        update.timereturning = `${hours}:${minutes}`
-
-    }
-
-    if (booking.petpicketup && booking.inprogress && booking.returning && !booking.completed) {
-
-        update.completed = true
-        update.timecompleted = `${hours}:${minutes}`
-        update.status = "completed"
-
-    }
+            update.petpicketup = true
+            update.timepetpicketup = `${hours}:${minutes}`
     
+        }
+    
+        if (booking.petpicketup && !booking.inprogress && !booking.returning && !booking.completed) {
+    
+            update.inprogress = true
+            update.timeinprogress = `${hours}:${minutes}`
+    
+        }
+    
+        if (booking.petpicketup && booking.inprogress && !booking.returning && !booking.completed) {
+    
+            update.returning = true
+            update.timereturning = `${hours}:${minutes}`
+    
+        }
+    
+        if (booking.petpicketup && booking.inprogress && booking.returning && !booking.completed) {
+    
+            update.completed = true
+            update.timecompleted = `${hours}:${minutes}`
+            update.status = "completed"
+    
+        }
+
+    }
 
     try {
         await Bookings.findByIdAndUpdate(id, { $set: update }, { new: true });
