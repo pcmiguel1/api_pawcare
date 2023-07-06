@@ -30,6 +30,10 @@ const bookingsSchema = new mongoose.Schema({
     },
     message: {
         type: String
+    },
+    total: {
+        type: String, 
+        required: true
     }
 });
 

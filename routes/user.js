@@ -277,7 +277,7 @@ router.get("/favourite/:id", authenticateToken, async (req, res) => {
 
 router.post("/booking/add", authenticateToken, async (req, res) => {
 
-    const { sitterId, serviceType, startDate, endDate, location, message, pets } = req.body;
+    const { sitterId, serviceType, startDate, endDate, location, message, pets, total } = req.body;
 
     //Validations
     if (!sitterId) return res.status(422).json({ message: 'sitterId is required!' })
@@ -286,6 +286,7 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
     if (!endDate) return res.status(422).json({ message: 'endDate is required!' })
     if (!location) return res.status(422).json({ message: 'location is required!' })
     if (!pets) return res.status(422).json({ message: 'pets is required!' })
+    if (!total) return res.status(422).json({ message: 'total is required!' })
 
     const booking = new Bookings({
         user_id: req.userId,
@@ -294,7 +295,8 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
         endDate: endDate,
         serviceType: serviceType,
         location: location,
-        message: message || ""
+        message: message || "",
+        total: total
     });
 
     try {
