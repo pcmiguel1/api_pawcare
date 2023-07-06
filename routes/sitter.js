@@ -139,7 +139,7 @@ router.get("/list", authenticateToken, async (req, res) => {
             const query = { verified: true, user_id: { $ne: req.userdId }, $or: Object.entries(find).map(([key, value]) => ({ [key]: value })) };
             sitters = await Sitter.find(query);
         } else {
-        sitters = await Sitter.find({ verified: true, user_id: { $ne: req.userdId } });
+        sitters = await Sitter.find({ verified: true, user_id: { $ne: req.userId } });
         }
 
         if (!sitters || sitters.length === 0) {
