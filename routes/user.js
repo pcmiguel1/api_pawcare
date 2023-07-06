@@ -227,7 +227,23 @@ router.post("/contacts/add/:id", authenticateToken, async (req, res) => {
 router.get("/contacts", authenticateToken, async (req, res) => {
 
     const contacts = await Contacts.find({ user_id: req.userId });
-    return res.status(200).json(contacts);
+
+    const result = [];
+
+    for (const contact of contacts) {
+        const sitter = await Sitter.findById(contact.sitterId);
+
+        const object = { ...contact._doc };
+
+        const user = await User.findById(sitter.user_id);
+
+        object.image = user.image;
+        object.name = user.fullname
+
+        result.push(object);
+    }
+
+    return res.status(200).json(result);
 
 })
 

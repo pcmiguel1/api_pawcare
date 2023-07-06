@@ -116,7 +116,22 @@ router.get("/contacts", authenticateToken, async (req, res) => {
     if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
 
     const contacts = await Contacts.find({ sitterId: sitterExist._id });
-    return res.status(200).json(contacts);
+
+    const result = [];
+
+    for (const contact of contacts) {
+        const object = { ...contact._doc };
+
+        const user = await User.findById(contact.user_id);
+
+        object.image = user.image;
+        object.name = user.fullname
+
+        result.push(object);
+    }
+
+
+    return res.status(200).json(result);
 
 })
 
