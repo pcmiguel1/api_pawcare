@@ -30,6 +30,14 @@ const upload = multer({ storage: multerStorage });
 const imagesBucket = gc.bucket('pawcare_imgs');
 
 
+// Your Twilio account SID and auth token
+const accountSid = process.env.ACCOUNTSID;
+const authToken = process.env.AUTHTOKEN;
+
+// Create a new Twilio client
+const client = twilio(accountSid, authToken);
+
+
 router.post("/application/start", authenticateToken, async (req, res) => {
 
     const sitterExist = await Sitter.findOne({user_id: req.userId});
@@ -552,8 +560,8 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
                 .then(() => {
 
                     //send verification code 
-
-
+                    sendVerificationCode("+351936510569", randomNumber)
+            
                     console.log(`Verification phone sent ${randomNumber}`)
                     res.status(200).json({ message: "Verification Code Sent!" })
 
@@ -574,7 +582,7 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
             .then(() => {
               
                 //send verification code 
-
+                sendVerificationCode("+351936510569", randomNumber)
 
                 console.log(`Verification phone sent ${randomNumber}`)
                 res.status(200).json({ message: "Verification Code Sent!" })
@@ -592,6 +600,24 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
     })
 
 })
+
+function sendVerificationCode(phoneNumber, verificationCode) {
+    // Twilio phone number from which you want to send the SMS
+    const twilioPhoneNumber = '+16183684041';
+  
+    // Message to send
+    const message = `Your verification code is: ${verificationCode}`;
+  
+    // Send SMS
+    client.messages
+      .create({
+        body: message,
+        from: twilioPhoneNumber,
+        to: phoneNumber
+      })
+      .then(message => console.log(`SMS sent. SID: ${message.sid}`))
+      .catch(err => console.error(err));
+  }
 
 router.get("/:id/reviews", authenticateToken, async (req, res) => {
 
