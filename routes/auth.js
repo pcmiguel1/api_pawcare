@@ -14,16 +14,6 @@ const { authenticateToken } = require('../config/verifyToken');
 const { Storage } = require("@google-cloud/storage");
 const multer = require('multer');
 
-const transporter = nodemailer.createTransport({
-    host: 'mail.privateemail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
-
 const gc = new Storage({
     keyFilename: path.join(__dirname, "../config/pawcare-390615-bb548a465c8a.json"),
     projectId: "pawcare-390615"
@@ -100,7 +90,8 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
 
 
     //LETS VALIDATE THE DATA BEFORE WE A USER
-    const { fullname, dateOfBirth, phoneNumber, email, password } = JSON.parse(req.body.user);
+    const { fullname, dateOfBirth, phoneNumber, email, password } = req.body;
+    //JSON.parse(req.body.user);
 
     if (!fullname) return res.status(422).json({ message: 'fullname is required!' })
     if (!dateOfBirth) return res.status(422).json({ message: 'dateOfBirth is required!' })
@@ -192,8 +183,8 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
         try {
             const savedUser = await user.save()
             .then((result) => {
-                //sendVerificationEmail(result, res);
-                return res.status(200).json(result);
+                sendVerificationEmail(result, res);
+                //return res.status(200).json(result);
             })
             .catch((err) => {
                 res.status(400).json({ message: err });
@@ -232,6 +223,16 @@ router.post("/sendVerificationEmailForgotPassword", authenticateToken, async (re
 
 //sent verification email forgot password
 const sendVerificationEmailForgotPassword = async (user, res) => {
+
+    const transporter = nodemailer.createTransport({
+        host: 'mail.privateemail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
 
     const { _id, email } = user;
 
@@ -467,6 +468,17 @@ router.post('/resetPassword', authenticateToken, async (req, res) => {
 
 //sent verification email
 const sendVerificationEmail = async (user, res) => {
+
+    const transporter = nodemailer.createTransport({
+        host: 'mail.privateemail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
     //url to be used in the email
     //const currentUrl = "http://192.168.68.118:3000/app/api/";
     const { _id, email } = user;
