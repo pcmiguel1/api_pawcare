@@ -505,13 +505,13 @@ const sendVerificationEmail = async (user, res) => {
     });
 
     UserVerification
-    .find({_id})
+    .find({userId: _id})
     .then((result) => {
         if (result.length > 0) {
             //user verification record exists so delete and create a new one
 
             UserVerification
-                    .deleteOne({_id})
+                    .deleteOne({userId: _id})
                     .then(result => {
                         User
                             .deleteOne({_id: _id})
@@ -565,6 +565,14 @@ const sendVerificationEmail = async (user, res) => {
     })
 
 }
+
+router.post("/resend/:userId", authenticateToken, async (req, res) => {
+
+    const user = await User.findById(req.params.userId);
+
+    sendVerificationEmail(user, res);
+
+})
 
 //verify email
 router.get('/verify/:userId/:code', authenticateToken, (req, res) => {
