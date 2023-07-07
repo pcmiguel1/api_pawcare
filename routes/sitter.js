@@ -539,7 +539,7 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
 
 })
 
-router.get("/:id/reviews", async (req, res) => {
+router.get("/:id/reviews", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
 
@@ -548,7 +548,7 @@ router.get("/:id/reviews", async (req, res) => {
 
 })
 
-router.post("/:id/reviews/add", async (req, res) => {
+router.post("/:id/reviews/add", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
 
