@@ -562,7 +562,7 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
                 .then(() => {
 
                     //send verification code 
-                    sendVerificationCode("+351936510569", randomNumber)
+                    sendVerificationCode(phoneNumber, randomNumber)
             
                     console.log(`Verification phone sent ${randomNumber}`)
                     res.status(200).json({ message: "Verification Code Sent!" })
@@ -584,7 +584,7 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
             .then(() => {
               
                 //send verification code 
-                sendVerificationCode("+351936510569", randomNumber)
+                sendVerificationCode(phoneNumber, randomNumber)
 
                 console.log(`Verification phone sent ${randomNumber}`)
                 res.status(200).json({ message: "Verification Code Sent!" })
