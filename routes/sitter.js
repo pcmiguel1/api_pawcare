@@ -18,6 +18,8 @@ const { Storage } = require("@google-cloud/storage");
 const multer = require('multer');
 const { json } = require('body-parser');
 
+const twilio = require('twilio');
+
 const gc = new Storage({
     keyFilename: path.join(__dirname, "../config/pawcare-390615-bb548a465c8a.json"),
     projectId: "pawcare-390615"
@@ -31,8 +33,8 @@ const imagesBucket = gc.bucket('pawcare_imgs');
 
 
 // Your Twilio account SID and auth token
-const accountSid = process.env.ACCOUNTSID;
-const authToken = process.env.AUTHTOKEN;
+const accountSid = "AC7e0ae0e86dded869c9d75b9a52a27ea5"
+const authToken = "2a5509523d526859d183084e97851c00"
 
 // Create a new Twilio client
 const client = twilio(accountSid, authToken);
