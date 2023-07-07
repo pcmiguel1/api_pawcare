@@ -546,7 +546,31 @@ router.get("/:id/reviews", async (req, res) => {
     const reviews = await Reviews.find({sitterId: id});
     return res.status(200).json(reviews);
 
+})
 
+router.post("/:id/reviews/add", async (req, res) => {
+
+    let id = req.params.id;
+
+    const { rate, message } = req.body;
+
+    //Validations
+    if (!rate) return res.status(422).json({ message: 'rate is required!' })
+    if (!message) return res.status(422).json({ message: 'message is required!' })
+
+    const review = new Reviews({
+        user_id: req.userId,
+        sitterId: id,
+        rate: rate,
+        message: message
+    });
+
+    try {
+        const savedreview = await review.save();
+        return res.status(200).json(savedreview);
+    } catch (err) {
+        return res.status(400).json({ message: err });
+    }
 
 })
 
