@@ -32,14 +32,6 @@ const upload = multer({ storage: multerStorage });
 const imagesBucket = gc.bucket('pawcare_imgs');
 
 
-// Your Twilio account SID and auth token
-const accountSid = "AC6202d584d080994cbea0538a7913e541"
-const authToken = "b8ec3aca0b57982716cbf85ede20f179"
-
-// Create a new Twilio client
-const client = twilio(accountSid, authToken);
-
-
 router.post("/application/start", authenticateToken, async (req, res) => {
 
     const sitterExist = await Sitter.findOne({user_id: req.userId});
@@ -604,6 +596,14 @@ router.post("/phone/sendVerification/:phoneNumber", authenticateToken, async (re
 })
 
 function sendVerificationCode(phoneNumber, verificationCode) {
+
+    // Your Twilio account SID and auth token
+    const accountSid = process.env.ACCOUNT_SID
+    const authToken = process.env.AUTH_TOKEN
+
+    // Create a new Twilio client
+    const client = twilio(accountSid, authToken);
+
     // Twilio phone number from which you want to send the SMS
     const twilioPhoneNumber = '+16183684041';
   
