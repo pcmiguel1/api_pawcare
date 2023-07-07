@@ -33,8 +33,8 @@ const imagesBucket = gc.bucket('pawcare_imgs');
 
 
 // Your Twilio account SID and auth token
-const accountSid = "AC7e0ae0e86dded869c9d75b9a52a27ea5"
-const authToken = "2a5509523d526859d183084e97851c00"
+const accountSid = "AC6202d584d080994cbea0538a7913e541"
+const authToken = "b8ec3aca0b57982716cbf85ede20f179"
 
 // Create a new Twilio client
 const client = twilio(accountSid, authToken);
