@@ -57,24 +57,31 @@ router.post("/login", authenticateToken, async (req, res) => {
 
             if (user.verified) {
 
-                //PASSWORD IS CORRECT
-                const validPass = await bcrypt.compare(password, user.password);
-                if (!validPass) return res.status(404).json({message: "Wrong credentials"});
+                if (!user.deleted) {
 
-                const sitterExist = await Sitter.findOne({user_id: user._id.toString()});
+                    //PASSWORD IS CORRECT
+                    const validPass = await bcrypt.compare(password, user.password);
+                    if (!validPass) return res.status(404).json({message: "Wrong credentials"});
 
-                //Create and assign a token
-                const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '10h', issuer: process.env.ISSUER_JWT });
+                    const sitterExist = await Sitter.findOne({user_id: user._id.toString()});
 
-                var resultUser = { ...user._doc };
-                if (sitterExist) resultUser.sitterId = sitterExist._id.toString()
+                    //Create and assign a token
+                    const token = jwt.sign({_id: user._id}, process.env.TOKEN_SECRET, { expiresIn: '10h', issuer: process.env.ISSUER_JWT });
 
-                var result = {}
+                    var resultUser = { ...user._doc };
+                    if (sitterExist) resultUser.sitterId = sitterExist._id.toString()
 
-                result.user = resultUser;
-                result.token = token;
+                    var result = {}
 
-                res.status(200).json(result);
+                    result.user = resultUser;
+                    result.token = token;
+
+                    res.status(200).json(result);   
+
+                }
+                else {
+                    return res.status(400).json({message: "Wrong credentials"}); 
+                }
 
             }
             else {
