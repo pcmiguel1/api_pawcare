@@ -157,8 +157,8 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
                 try {
                     const savedUser = await user.save()
                     .then((result) => {
-                        //sendVerificationEmail(result, res);
-                        return res.status(200).json(result);
+                        sendVerificationEmail(result, res);
+                        //return res.status(200).json(result);
                     })
                     .catch((err) => {
                         res.status(400).json({ message: err });
