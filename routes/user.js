@@ -257,6 +257,7 @@ router.get("/favourites", authenticateToken, async (req, res) => {
 
     for (const favourite of favourites) {
         const sitter = await Sitter.findById(favourite.sitterId);
+        const reviews = await Reviews.find({sitterId: sitter._id})
 
         const object = { ...sitter._doc };
 
@@ -264,6 +265,7 @@ router.get("/favourites", authenticateToken, async (req, res) => {
 
         object.image = user.image;
         object.name = user.fullname
+        object.reviews = reviews || []
 
         result.push(object);
     }
