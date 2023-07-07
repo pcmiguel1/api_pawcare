@@ -20,6 +20,10 @@ const reviewsSchema = new mongoose.Schema({
     message: {
         type: String,
         required: true
+    },
+    createdat: {
+        type: Date,
+        default: Date.now
     }
 });
 

@@ -544,7 +544,21 @@ router.get("/:id/reviews", authenticateToken, async (req, res) => {
     let id = req.params.id;
 
     const reviews = await Reviews.find({sitterId: id});
-    return res.status(200).json(reviews);
+
+    const result = [];
+
+    for (const review of reviews) {
+
+        const userExist = await User.findById(review.user_id);
+
+        const object = { ...review._doc };
+
+        object.user = userExist || {}
+
+        result.push(object);
+    }
+
+    return res.status(200).json(result);
 
 })
 
