@@ -552,7 +552,7 @@ router.post("/:id/reviews/add", authenticateToken, async (req, res) => {
 
     let id = req.params.id;
 
-    const { rate, message } = req.body;
+    const { rate, message, bookingId } = req.body;
 
     //Validations
     if (!rate) return res.status(422).json({ message: 'rate is required!' })
@@ -561,6 +561,7 @@ router.post("/:id/reviews/add", authenticateToken, async (req, res) => {
     const review = new Reviews({
         user_id: req.userId,
         sitterId: id,
+        bookingId: bookingId,
         rate: rate,
         message: message
     });

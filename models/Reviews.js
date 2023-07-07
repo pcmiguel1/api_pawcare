@@ -9,6 +9,10 @@ const reviewsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    bookingId: {
+        type: String,
+        required: true
+    },
     rate: {
         type: String,
         required: true

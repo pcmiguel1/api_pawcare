@@ -15,6 +15,7 @@ const path = require('path')
 
 const { Storage } = require("@google-cloud/storage");
 const multer = require('multer');
+const Reviews = require('../models/Reviews');
 
 const gc = new Storage({
     keyFilename: path.join(__dirname, "../config/pawcare-390615-bb548a465c8a.json"),
@@ -417,12 +418,15 @@ router.get("/bookings/completed", authenticateToken, async (req, res) => {
         if (booking.status == "completed" || booking.status == "canceled") {
             const sitter = await Sitter.findById(booking.sitterId);
 
+            const review = await Reviews.findOne({ bookingId: booking._id });
+        
             const object = { ...booking._doc };
 
             const user = await User.findById(sitter.user_id);
 
             object.image = user.image;
-            object.name = user.fullname
+            object.name = user.fullname;
+            object.review = review || {}
 
             result.push(object);
         }
