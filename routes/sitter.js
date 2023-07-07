@@ -183,14 +183,18 @@ router.get("/list", authenticateToken, async (req, res) => {
                     const distance = calculateDistance(latitude, longitude, lat, long);
                     if (distance <= 20) {
                         const user = await User.findById(user_id);
+                        const reviews = await Reviews.find({sitterId: sitter._id})
                         object.name = user.fullname;
                         object.image = user.image;
+                        object.reviews = reviews || []
                         return object;
                     }
                 } else {
                     const user = await User.findById(user_id);
+                    const reviews = await Reviews.find({sitterId: sitter._id})
                     object.name = user.fullname;
                     object.image = user.image;
+                    object.reviews = reviews || []
                     return object;
                 }
             })
