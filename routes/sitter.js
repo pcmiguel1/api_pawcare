@@ -234,6 +234,56 @@ router.get("/bookings", authenticateToken, async (req, res) => {
     return res.status(200).json(bookings);
 });
 
+router.get("/income", authenticateToken, async (req, res) => {
+
+    const sitterExist = await Sitter.findOne({user_id: req.userId});
+    if (!sitterExist) return res.status(400).json({ message: "User is not a sitter!" })
+
+    var result = {}
+
+    var totalWalking = 0.0
+    var totalBoarding = 0.0
+    var totalHouseSitting = 0.0
+    var totalTraining = 0.0
+    var totalGrooming = 0.0
+
+    var active = 0
+    var finished = 0
+    var canceled = 0
+
+    var bookings = await Bookings.find({sitterId: sitterExist._id})
+
+    for (const booking of bookings) {
+
+        if (booking.serviceType == "petwalking" && booking.status == "completed") totalWalking += parseFloat(booking.total);
+        if (booking.serviceType == "petboarding" && booking.status == "completed") totalBoarding += parseFloat(booking.total);
+        if (booking.serviceType == "housesitting" && booking.status == "completed") totalHouseSitting += parseFloat(booking.total);
+        if (booking.serviceType == "pettraning" && booking.status == "completed") totalTraining += parseFloat(booking.total);
+        if (booking.serviceType == "petgrooming" && booking.status == "completed") totalGrooming += parseFloat(booking.total);
+
+        if (booking.status == "started") active++;
+        if (booking.status == "completed") finished++;
+        if (booking.status == "canceled") canceled++;
+
+    }
+
+    result.totalWalking = totalWalking;
+    result.totalBoarding = totalBoarding;
+    result.totalHouseSitting = totalHouseSitting;
+    result.totalTraining = totalTraining;
+    result.totalGrooming = totalGrooming;
+
+    result.active = active;
+    result.finished = finished;
+    result.canceled = canceled;
+
+    result.total = totalWalking + totalBoarding + totalHouseSitting + totalTraining + totalGrooming;
+
+    
+    return res.status(200).json(result)
+
+})
+
 router.post("/booking/update/:id", authenticateToken, async (req, res) => {
 
     var id = req.params.id;
