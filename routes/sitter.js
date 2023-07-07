@@ -615,7 +615,7 @@ function sendVerificationCode(phoneNumber, verificationCode) {
       .create({
         body: message,
         from: twilioPhoneNumber,
-        to: phoneNumber
+        to: '+' + phoneNumber
       })
       .then(message => console.log(`SMS sent. SID: ${message.sid}`))
       .catch(err => console.error(err));
