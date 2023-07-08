@@ -565,11 +565,91 @@ const sendVerificationEmail = async (user, res) => {
 
 }
 
+const resendVerificationEmail = async (user, res) => {
+
+    const transporter = nodemailer.createTransport({
+        host: 'mail.privateemail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.EMAIL_PASSWORD
+        }
+    });
+
+    //url to be used in the email
+    //const currentUrl = "http://192.168.68.118:3000/app/api/";
+    const { _id, email } = user;
+
+    //const uniqueString = uuidv4() + _id;
+
+    //var url = currentUrl + "auth/verify/" + _id + "/" + uniqueString
+
+    const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+
+    //mail options
+    const mailOptions = {
+        from: process.env.EMAIL,
+        to: email,
+        subject: "Verify your Email",
+        html: `<p>Code to confirm Email is valid for 1h: <b>${randomNumber}</b></p>`,
+    }
+
+    const newVerification = new UserVerification({
+        userId: _id,
+        code: randomNumber,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 3600000
+    });
+
+    UserVerification
+    .find({userId: _id})
+    .then((result) => {
+        if (result.length > 0) {
+            //user verification record exists so delete and create a new one
+
+            UserVerification
+                    .deleteOne({userId: _id})
+                    .then(result => {
+                        
+                        newVerification
+                        .save()
+                        .then(() => {
+                            transporter
+                            .sendMail(mailOptions)
+                            .then(() => {
+                                //email sent and verification record saved
+                                console.log(`Verification email sent ${randomNumber}`)
+                                res.status(200).json(user);
+                            })
+                        })
+                        .catch((err) => {
+                            res.status(400).json({ message: err })
+                        })
+
+                    })
+                    .catch((err) => {
+                        res.status(400).json({ message: err })
+                    })
+
+        } else {
+
+            res.status(400).json({ message: "user does not exist!" })
+
+        }
+    })
+    .catch((err) => {
+        res.status(400).json({ message: err })
+    })
+
+}
+
+
 router.post("/resend/:userId", authenticateToken, async (req, res) => {
 
     const user = await User.findById(req.params.userId);
 
-    sendVerificationEmail(user, res);
+    resendVerificationEmail(user, res);
 
 })
 
