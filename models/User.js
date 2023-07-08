@@ -19,9 +19,6 @@ const userSchema = new mongoose.Schema({
         max: 1024,
         min: 6
     },
-    phoneNumber: {
-        type: String
-    },
     dateOfBirth: {
         type: String,
         require: true

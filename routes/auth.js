@@ -176,8 +176,7 @@ router.post("/register", authenticateToken, upload.single('image'), async (req, 
             fullname: fullname,
             email: email,
             password: hashPassword,
-            dateOfBirth: dateOfBirth,
-            phoneNumber: phoneNumber
+            dateOfBirth: dateOfBirth
         });
 
         try {
