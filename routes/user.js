@@ -383,6 +383,13 @@ router.post("/booking/add", authenticateToken, async (req, res) => {
 
 })
 
+router.get("/notifications", authenticateToken, async (req, res) => {
+
+    const notifications = await Notifications.find({ userId: req.userId })
+    return res.status(200).json(notifications);
+
+})
+
 router.get("/bookings/active", authenticateToken, async (req, res) => {
 
     const bookings = await Bookings.find({ user_id: req.userId });
