@@ -89,4 +89,18 @@ router.post("/send", authenticateToken, async (req, res) => {
 
 })
 
+router.post("/delete/:id", authenticateToken, async (req, res) => {
+
+    var id = req.params.id;
+
+    Notifications.findByIdAndDelete(id, (err, result) => {
+        if (err) {
+            res.json({ message: err.message });
+        } else {
+            return res.status(200).json({ message: "Notification deleted successfully!" });
+        }
+    });
+
+})
+
 module.exports = router;
