@@ -11,7 +11,7 @@ router.post("/postToken", authenticateToken, async (req, res) => {
     //Validations
     if (!token) return res.status(422).json({ msg: 'Token is required!' })
 
-    const userExist = await Notification.findOne({user_id: id});
+    const userExist = await Notification.findOne({user_id: req.userId});
     if (!userExist) {
 
         const notification = new Notification({
