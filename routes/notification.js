@@ -52,7 +52,7 @@ router.post("/send", authenticateToken, async (req, res) => {
     if (!title) return res.status(422).json({ msg: 'title is required!' })
     if (!body) return res.status(422).json({ msg: 'body is required!' })
 
-    const userExist = await Notification.findOne({user_id: id});
+    const userExist = await Notification.findOne({user_id: userId});
     if (!userExist) return res.status(422).json({ message: "No result!" })
 
     const message = {
