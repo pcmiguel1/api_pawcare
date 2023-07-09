@@ -7,6 +7,7 @@ const Bookings = require('../models/Bookings');
 const PetBookings = require('../models/PetBookings');
 const Contacts = require('../models/Contacts');
 const Messages = require('../models/Messages');
+const Notifications = require('../models/Notifications');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../config/verifyToken');
