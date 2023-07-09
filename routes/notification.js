@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const Notification = require('../models/Notification');
+const Notifications = require('../models/Notifications');
 const admin = require('firebase-admin');
 const { authenticateToken } = require('../config/verifyToken');
 
@@ -63,9 +64,23 @@ router.post("/send", authenticateToken, async (req, res) => {
     };
 
     admin.messaging().send(message)
-        .then((response) => {
-             console.log('Successfully sent message:', response);
-             res.status(200).json({ message: "Notification Sent" })
+        .then(async (response) => {
+
+            const notifications = new Notifications({
+                userId: req.userId,
+                title: title,
+                body: body
+            });
+        
+            try {
+                const savedNotification = await notifications.save();
+            
+                console.log('Successfully sent message:', response);
+                res.status(200).json(savedNotification)
+            } catch(err) {
+                res.status(400).send(err);
+            }
+
         })
         .catch((error) => {
             console.log('Error sending message:', error);
