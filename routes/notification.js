@@ -67,7 +67,7 @@ router.post("/send", authenticateToken, async (req, res) => {
         .then(async (response) => {
 
             const notifications = new Notifications({
-                userId: req.userId,
+                userId: userId,
                 title: title,
                 body: body
             });
