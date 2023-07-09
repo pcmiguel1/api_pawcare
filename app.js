@@ -15,6 +15,13 @@ const bodyParser = require('body-parser');
 const authApp = require('./routes/auth');
 const userApp = require('./routes/user');
 const sitterApp = require('./routes/sitter');
+const notificationApp = require('./routes/notification');
+
+const serviceAccount = require('./config/pawcare-c3b05-firebase-adminsdk-zp3lb-d9b211d844.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 //APP
 
@@ -48,7 +55,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authApp);
 app.use('/api/user', userApp);
 app.use('/api/sitter', sitterApp);
-//app.use('/app/api/notification', notificationApp);
+app.use('/api/notification', notificationApp);
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 

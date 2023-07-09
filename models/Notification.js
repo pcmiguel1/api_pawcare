@@ -4,6 +4,10 @@ const notificationSchema = new mongoose.Schema({
     token: {
         type: String,
         required: true
+    },
+    userId: {
+        type: String,
+        required: true
     }
 });
 
