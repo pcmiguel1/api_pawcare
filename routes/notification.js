@@ -11,17 +11,34 @@ router.post("/postToken", authenticateToken, async (req, res) => {
     //Validations
     if (!token) return res.status(422).json({ msg: 'Token is required!' })
 
-    const notification = new Notification({
-        token: token,
-        userId: req.userId
-    });
+    const userExist = await Notification.findOne({user_id: id});
+    if (!userExist) {
 
-    try {
-        const savedNotification = await notification.save();
+        const notification = new Notification({
+            token: token,
+            userId: req.userId
+        });
     
-        res.status(200).json(savedNotification);
-    } catch(err) {
-        res.status(400).send(err);
+        try {
+            const savedNotification = await notification.save();
+        
+            res.status(200).json({ message: "notification code sent" })
+        } catch(err) {
+            res.status(400).send(err);
+        }
+
+    } else {
+
+        try {
+
+            await Notification.findByIdAndUpdate(userExist._id, { token: token }, { new: true });
+
+            return res.status(200).json({ message: "notification code sent" })
+        } catch (err) {
+            console.log(err);
+            return res.status(400).json({ message: err });
+        }
+
     }
 
 })
