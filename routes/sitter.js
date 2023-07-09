@@ -337,8 +337,8 @@ router.post("/booking/update/:id", authenticateToken, async (req, res) => {
     }
 
     try {
-        await Bookings.findByIdAndUpdate(id, { $set: update }, { new: true });
-        return res.status(200).json({message: "State updated!"});
+        const bookingupdated = await Bookings.findByIdAndUpdate(id, { $set: update }, { new: true });
+        return res.status(200).json(bookingupdated);
     } catch (err) {
         console.log(err);
         return res.status(400).json({ message: err });
