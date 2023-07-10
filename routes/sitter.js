@@ -6,6 +6,7 @@ const PictureImage = require('../models/PictureSitter');
 const Bookings = require('../models/Bookings');
 const PhoneVerification = require('../models/PhoneVerification');
 const ApplicationSitter = require('../models/ApplicationSitter');
+const PetBookings = require('../models/PetBookings');
 const Messages = require('../models/Messages');
 const Reviews = require('../models/Reviews');
 const Contacts = require('../models/Contacts');
@@ -232,8 +233,32 @@ router.get("/bookings", authenticateToken, async (req, res) => {
     });
   
     console.log(bookings.map(booking => booking.startDate)); // Sorted array of startDate values within the specified month and year
+
+    var result = []
+
+    for (const booking of bookings) {
+
+        var obj = {}
+
+        obj = {...booking._doc};
+
+        let user = await User.findById(booking.user_id)
+        let pets = await PetBookings.find({ bookingId: booking._id })
+
+        obj.user = user;
+
+        var petsarray = []
+        for (const pet of pets) {
+
+            let animal = await Pet.findById(pet.petId)
+            petsarray.push(animal)
+        }
+        obj.pets = petsarray;
+
+        result.push(obj);
+    }  
   
-    return res.status(200).json(bookings);
+    return res.status(200).json(result);
 });
 
 router.get("/income", authenticateToken, async (req, res) => {
