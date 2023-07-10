@@ -131,6 +131,31 @@ router.get("/contacts", authenticateToken, async (req, res) => {
         object.image = user.image;
         object.name = user.fullname
 
+
+        const messages = await Messages.find({
+            $or: [
+              {
+                "sender.id": sitterExist._id.toString(),
+                "receiver.id": contact.user_id
+              },
+              {
+                "sender.id": contact.user_id,
+                "receiver.id": sitterExist._id.toString()
+              }
+            ]
+          })
+            .sort({ createdat: -1 })
+            .exec();
+
+
+        if (messages.length > 0) {
+
+            object.lastMessage = messages[0].message || ""
+            object.date = messages[0].createdat || ""
+
+        }
+
+
         result.push(object);
     }
 

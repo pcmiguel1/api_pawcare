@@ -243,7 +243,32 @@ router.get("/contacts", authenticateToken, async (req, res) => {
         object.image = user.image;
         object.name = user.fullname
 
+
+        const messages = await Messages.find({
+            $or: [
+              {
+                "sender.id": req.userId,
+                "receiver.id": sitter._id.toString()
+              },
+              {
+                "sender.id": sitter._id.toString(),
+                "receiver.id": req.userId
+              }
+            ]
+          })
+            .sort({ createdat: -1 })
+            .exec();
+
+
+        if (messages.length > 0) {
+
+            object.lastMessage = messages[0].message || ""
+            object.date = messages[0].createdat || ""
+
+        }
+
         result.push(object);
+
     }
 
     return res.status(200).json(result);
