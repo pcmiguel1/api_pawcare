@@ -10,20 +10,11 @@ const admin = require('firebase-admin');
 
 const bodyParser = require('body-parser');
 
-//Import Routes
 
-const authApp = require('./routes/auth');
-const userApp = require('./routes/user');
-const sitterApp = require('./routes/sitter');
-const notificationApp = require('./routes/notification');
 
-const serviceAccount = require('./config/pawcare-c3b05-firebase-adminsdk-zp3lb-d9b211d844.json');
+const indexRouter = require('./routes/indexRouter');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
-//APP
 
 dotenv.config();
 app.use(cookieParser());
@@ -39,9 +30,8 @@ mongoose.connect(
 
 
 //Middleware
-//app.engine('html', require('ejs').renderFile);
-//app.set('view engine', 'ejs'); // ejs
-//app.set('views', path.join(__dirname, '/public'));
+app.set('view engine', 'ejs'); // ejs
+app.set('views', path.join(__dirname, '/public'));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -52,12 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //Route Middleware
 
-app.use('/api/auth', authApp);
-app.use('/api/user', userApp);
-app.use('/api/sitter', sitterApp);
-app.use('/api/notification', notificationApp);
-
-app.use('/images', express.static(path.join(__dirname, 'images')))
+app.use('/', indexRouter);
 
 port = process.env.PORT || 3000
 app.listen(port, () => console.log('Server Up and running'));
